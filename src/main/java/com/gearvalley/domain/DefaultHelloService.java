@@ -1,6 +1,7 @@
 package com.gearvalley.domain;
 
 import com.gearvalley.domain.models.Hello;
+import com.gearvalley.infrastructure.WorldPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
