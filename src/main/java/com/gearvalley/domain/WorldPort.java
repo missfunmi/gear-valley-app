@@ -1,4 +1,4 @@
-package com.gearvalley.infrastructure;
+package com.gearvalley.domain;
 
 public interface WorldPort {
   String getWorld();

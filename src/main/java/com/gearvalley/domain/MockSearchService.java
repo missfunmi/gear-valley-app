@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class DefaultSearchService implements SearchService {
+public class MockSearchService implements SearchService {
 
   private final ObjectMapper objectMapper;
   private final SearchResponse mockSearchResponse;
   private static final String SEARCH_RESPONSE_FILE = "mocks/search-results.json";
 
   @Autowired
-  public DefaultSearchService(ObjectMapper objectMapper) {
+  public MockSearchService(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
 
     try {
