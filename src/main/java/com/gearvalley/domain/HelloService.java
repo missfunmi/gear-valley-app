@@ -1,5 +1,7 @@
 package com.gearvalley.domain;
 
+import com.gearvalley.domain.models.Hello;
+
 public interface HelloService {
-  String getHello();
+  Hello getHello();
 }

@@ -1,5 +1,6 @@
 package com.gearvalley.domain;
 
+import com.gearvalley.domain.models.Hello;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ public class DefaultHelloService implements HelloService {
   }
 
   @Override
-  public String getHello() {
-    return "Hello " + worldPort.getWorld();
+  public Hello getHello() {
+    return Hello.builder().value("Hello " +  worldPort.getWorld()).build();
   }
 }
