@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/hello")
 public class HelloController {
   private final HelloService helloService;
 
@@ -18,7 +18,7 @@ public class HelloController {
     this.helloService = helloService;
   }
 
-  @RequestMapping("/hello")
+  @RequestMapping("")
   public ResponseEntity<Hello> getHello() {
     val hello = helloService.getHello();
     return ResponseEntity.ok(hello);

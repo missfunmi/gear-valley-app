@@ -1,2 +1,2 @@
 # Gear Valley
-## A price tracking app for gear shoppers.
+A price tracking app for gear shoppers.
