@@ -44,7 +44,14 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
     this.setState({loading: true, error: null});
     try {
       const request = { keyword: searchTerm };
-      const res = await fetch('api/v1/search', { method: 'POST', body: JSON.stringify(request)});
+      const res = await fetch('api/v1/search', {
+        method: 'POST',
+        body: JSON.stringify(request),
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
       const json = await res.json();
       this.setState({searchResult: json, loading: false});
     } catch(err) {
