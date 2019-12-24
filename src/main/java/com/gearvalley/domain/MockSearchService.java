@@ -3,11 +3,10 @@ package com.gearvalley.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gearvalley.domain.models.SearchRequest;
 import com.gearvalley.domain.models.SearchResponse;
-import java.io.File;
+import com.google.common.io.Resources;
+import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,9 +22,8 @@ public class MockSearchService implements SearchService {
     this.objectMapper = objectMapper;
 
     try {
-      Resource resource = new ClassPathResource(SEARCH_RESPONSE_FILE);
-      File file = resource.getFile();
-      this.mockSearchResponse = this.objectMapper.readValue(file, SearchResponse.class);
+      URL resourcePath = Resources.getResource(SEARCH_RESPONSE_FILE);
+      this.mockSearchResponse = this.objectMapper.readValue(resourcePath, SearchResponse.class);
     } catch (Exception e) {
       throw new RuntimeException("Oops. Error loading mock JSON file:", e);
     }
