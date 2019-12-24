@@ -1,4 +1,5 @@
 import React from 'react';
+import { List } from 'office-ui-fabric-react/lib/List';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
@@ -8,7 +9,25 @@ interface ISearchPageProps {};
 interface ISearchPageState {
   error: string | null;
   loading: boolean;
-  items: any;
+  searchResult: ISearchResultWrapper | null;
+};
+interface IGear {
+  title: string;
+  price: number;
+  size: string;
+  url: string;
+  base64Image: string;
+};
+interface ISearchResult {
+  providerId: string;
+  providerName: string;
+  providerHomePage: string;
+  providerLogo: string;
+  gear: Array<IGear>
+};
+interface ISearchResultWrapper {
+  keyword: string;
+  results: Array<ISearchResult>
 };
 // tslint:disable:jsx-no-lambda
 class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
@@ -17,7 +36,7 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
     this.state = {
       error: null,
       loading: false,
-      items: []
+      searchResult: null
     };
   }
 
@@ -27,7 +46,7 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
       const request = { keyword: searchTerm };
       const res = await fetch('api/v1/search', { method: 'POST', body: JSON.stringify(request)});
       const json = await res.json();
-      this.setState({items: json});
+      this.setState({searchResult: json, loading: false});
     } catch(err) {
       this.setState({
         error: err,
@@ -44,8 +63,21 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
     )
   }
 
+  renderResult(item?: ISearchResult) {
+    return (item &&
+      <div>
+        <p><a href={item.providerHomePage}>{item.providerName}</a></p>
+        {item.gear.map((gear: IGear) => {
+          return (
+            <p><img src={`data:image/png;charset=utf-8;base64, ${gear.base64Image}`}/><a href={gear.url}>{gear.title}</a> - {gear.price}</p>
+          )
+        })}
+      </div>
+    )
+  }
+
   public render(): JSX.Element {
-    const { error, loading, items } = this.state;
+    const { error, loading, searchResult } = this.state;
     return (
       <Stack tokens={{ childrenGap: 20, padding: 10 }}>
         <SearchBox
@@ -56,8 +88,9 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
           onChange={() => console.log('onChange called')}
         />
         {loading && this.renderLoader()}
-        <p>{JSON.stringify(items)}</p>
-        <p>{JSON.stringify(error)}</p>
+        {searchResult && <p>Results for "{searchResult.keyword}"</p>}
+        {searchResult && <List items={searchResult.results} onRenderCell={this.renderResult} />}
+        {error && <p>{JSON.stringify(error)}</p>}
       </Stack>
     );
   }
