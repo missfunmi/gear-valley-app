@@ -1,47 +1,50 @@
 package com.gearvalley.infrastructure;
 
 import com.gearvalley.domain.models.SearchResult;
-import com.google.common.collect.Lists;
-import java.io.IOException;
-import java.util.List;
+import java.math.BigDecimal;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 @Slf4j
-public class REIGearSearchClient implements GearSiteSearchClient {
+public class REIGearSearchClient extends ParserBasedGearSearchClient {
 
-  private static final String REI_BASE = "https://www.rei.com/search?q=%s&pagesize=90";
+  private String siteUrlBase = "https://www.rei.com/search?q=%s&pagesize=90";
+  private static final String SEARCH_RESULTS_ID = "search-results";
 
   @Override
-  public List<SearchResult> searchForGearByKeyword(String keyword) {
-    if (StringUtils.isEmpty(keyword)) {
-      return Lists.newArrayList();
-    }
+  public SearchResult searchForGearByKeyword(String keyword) {
+    Elements elements = searchForGear(keyword);
 
-    try {
-      Document doc = Jsoup.connect(String.format(REI_BASE, keyword))
-          .timeout(30000)
-          .userAgent("Mozilla/5.0")
-          .ignoreHttpErrors(true)
-          .get();
+    // Convert each Element to a Gear
 
-      if (doc == null) {
-        log.info("No search results available for keyword={}", keyword);
-        return Lists.newArrayList();
-      }
+    // Populate SearchResult
 
-      Elements searchResults =
-          doc.getElementById("search-results").getElementsByTag("ul").get(0).children();
+    return null;
+  }
 
-      log.info("Successfully fetched {} results: \n\n\n{}", searchResults.size(), searchResults);
+  @Override
+  BigDecimal extractGearPrice(Element element) {
+    return null;
+  }
 
-    } catch (IOException e) {
-      throw new RuntimeException("REI no likey: ", e)  ;
-    }
+  @Override
+  String extractGearDirectUrl(Element element) {
+    return null;
+  }
 
+  @Override
+  String extractGearBase64Image(Element element) {
+    return null;
+  }
+
+  @Override
+  String extractGearTitle(Element element) {
+    return null;
+  }
+
+  @Override
+  String extractGearSize(Element element) {
     return null;
   }
 }
