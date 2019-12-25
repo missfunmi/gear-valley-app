@@ -2,8 +2,11 @@ package com.gearvalley.infrastructure;
 
 import com.gearvalley.domain.models.Gear;
 import com.gearvalley.domain.models.SearchResult;
-import com.google.common.collect.Lists;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,38 +26,81 @@ public class REIGearSearchClient extends ParserBasedGearSearchClient {
 
   @Override
   public SearchResult searchForGearByKeyword(String keyword) {
-    Elements elements = searchForGear(PROVIDER_ID, keyword, SEARCH_RESULTS_ID);
-
+    List<Gear> gear = searchForGear(PROVIDER_ID, keyword);
+    log.info("Found {} gear={} for keyword={} at source={}", gear.size(), gear, keyword, PROVIDER_ID);
+    
     return SearchResult.builder()
         .providerId(PROVIDER_ID) // TODO -- should be a UUID?
         .providerName(PROVIDER_ID)
-        .gear(Lists.newArrayList()) // TODO -- Convert each Element above to a Gear
-        .providerHomePage("https://rei.com") // TODO -- Could likely get rid of this field...
+        .gear(gear)
+        .providerHomePage("https://rei.com") // TODO -- Rename this field
         .build();
   }
 
   @Override
-  Gear extractGearPrice(Element element) {
-    return null;
+  Elements filterToSearchResults(Document document) {
+    try {
+      return document.getElementById(SEARCH_RESULTS_ID).getElementsByTag("ul").get(0).children();
+    } catch (Exception e) {
+      log.warn("An error might have occurred, or there were no search results available");
+      return new Elements();
+    }
   }
 
   @Override
-  Gear extractGearDirectUrl(Element element) {
-    return null;
+  BigDecimal extractGearPrice(Element element) {
+    String price =
+        element
+            .select("li > a div:has(span)")
+            .get(0)
+            .select("span:not(:has(*)):contains($)")
+            .get(0)
+            .text();
+    log.info("Extracted price={}", price);
+    String replaced = StringUtils.remove(price, '$');
+    return new BigDecimal(replaced);
   }
 
   @Override
-  Gear extractGearBase64Image(Element element) {
-    return null;
+  String extractGearDirectUrl(Element element) {
+    String directUrl =
+        element
+            .select("li > a")
+            .get(0)
+            .attr("href");
+    log.info("Extracted directUrl={}", directUrl);
+    return directUrl;
   }
 
   @Override
-  Gear extractGearTitle(Element element) {
-    return null;
+  String extractGearImageSrc(Element element) {
+    String relativePathToImage =
+        element
+            .select("li > a > div img")
+            .get(0)
+            .attr("src");
+    log.info("Extracted relativePathToImage={}", relativePathToImage);
+    return relativePathToImage;
   }
 
   @Override
-  Gear extractGearSize(Element element) {
-    return null;
+  String extractGearTitle(Element element) {
+    String title =
+        element
+            .select("li > a > h2 > div")
+            .text();
+    log.info("Extracted title={}", title);
+    return title;
+  }
+
+  @Override
+  // TODO Holding metadata - needs to be renamed
+  String extractGearSize(Element element) {
+    String size =
+        element
+            .select("li > a > span")
+            .text();
+    log.info("Extracted metadata={}", size);
+    return size;
   }
 }

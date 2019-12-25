@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("production")
+@Profile({"dev", "prod"})
 @Slf4j
 public class DefaultSearchService implements SearchService {
   private final GearSiteSearchFacade gearSiteSearchFacade;

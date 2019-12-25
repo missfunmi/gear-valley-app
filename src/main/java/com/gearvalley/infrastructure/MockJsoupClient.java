@@ -1,11 +1,13 @@
 package com.gearvalley.infrastructure;
 
+import com.gearvalley.domain.models.GearImage;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +23,9 @@ public class MockJsoupClient implements JsoupClient {
 
   Map<String, String> providerIdToMockSearchResultsFilePath =
       ImmutableMap.of("REI", "mocks/rei-search-results.html");
+
+  Map<String, String> providerIdToMockSearchResultsImageFilePath =
+      ImmutableMap.of("REI", "mocks/rei-search-results-image.jpeg");
 
   @Override
   public Document fetchHTMLDocument(String providerId, String keyword) {
@@ -39,7 +44,27 @@ public class MockJsoupClient implements JsoupClient {
       log.info("Successfully fetched html from resourcePath={}", resourcePath);
       return Jsoup.parse(html, String.format(providerIdToSiteUrlBase.get(providerId), keyword));
     } catch (IOException e) {
-      throw new RuntimeException("Something bad happened while Jsouping the request", e);
+      throw new RuntimeException("Something bad happened while Jsoup-parsing the mock results file", e);
+    }
+  }
+
+  @Override
+  public GearImage fetchGearImage(String providerId, String relativePath) {
+    Preconditions.checkArgument(
+        StringUtils.isNotEmpty(providerId), "Invalid attempt to locate mock image file for empty providerId!");
+    Preconditions.checkArgument(
+        providerIdToSiteUrlBase.containsKey(providerId),
+        "Invalid attempt to locate mock image file for unknown providerId=%s!",
+        providerId);
+
+    try {
+      URL resourcePath =
+          Resources.getResource(providerIdToMockSearchResultsImageFilePath.get(providerId));
+      byte[] image = Resources.toByteArray(resourcePath);
+      String base64Image = Base64.getEncoder().encodeToString(image);
+      return GearImage.builder().base64Image(base64Image).contentType("image/jpeg;charset=utf-8").build();
+    } catch (IOException e) {
+      throw new RuntimeException("Something bad happened while fetching the mock image file", e);
     }
   }
 }

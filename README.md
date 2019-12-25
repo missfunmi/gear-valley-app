@@ -26,6 +26,12 @@ For UI development with hot reload, run the below command which should launch th
 ```shell script
 cd src/main/javascript/app
 yarn run start
-```
+```             
 
+### "Production" aka hitting live websites
+Production for now means hitting the real external site (as opposed to loading static HTML results from file). To run against the real site, set the following in ``application.properties``:
+```shell script 
+spring.profiles.active=prod
+application.expected.active.profile=prod
+```
 

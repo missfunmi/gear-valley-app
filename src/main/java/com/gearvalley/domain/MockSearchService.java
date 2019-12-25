@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("dev")
+@Profile("test")
 @Slf4j
 public class MockSearchService implements SearchService {
   private final ObjectMapper objectMapper;

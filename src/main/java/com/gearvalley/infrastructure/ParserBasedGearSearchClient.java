@@ -1,6 +1,9 @@
 package com.gearvalley.infrastructure;
 
 import com.gearvalley.domain.models.Gear;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,42 +18,32 @@ public abstract class ParserBasedGearSearchClient implements GearSiteSearchClien
     this.jsoupClient = jsoupClient;
   }
 
-  Elements searchForGear(String providerId, String keyword, String searchResultsId) {
+  List<Gear> searchForGear(String providerId, String keyword) {
     Document document = jsoupClient.fetchHTMLDocument(providerId, keyword);
+    Elements matchingElements = filterToSearchResults(document);
 
-    // TODO -- searchResultsId is impl specific, need to rewrite
-    if (document == null || document.getElementById(searchResultsId) == null) {
-      log.warn(
-          "VVVVVVVVVVVV Error might have occurred, or there were no search results available for keyword={}",
-          keyword);
-      return new Elements();
-    }
-
-    log.info(
-        "VVVVVVVVVVVV Completed Jsoup parsing of uri={} and retrieved document={}",
-        document.location(),
-        document);
-
-    // TODO -- Impl specific, need to rewrite
-    Elements searchResults =
-        document.getElementById(searchResultsId).getElementsByTag("ul").get(0).children();
-
-    log.info(
-        "VVVVVVVVVVVV Successfully fetched {} results for keyword={}. Results are: \n\n\n{}",
-        searchResults.size(),
-        keyword,
-        searchResults);
-
-    return searchResults;
+    return matchingElements.stream()
+        .map(
+            x ->
+                Gear.builder()
+                    .price(extractGearPrice(x))
+                    .title(extractGearTitle(x))
+                    .url(extractGearDirectUrl(x))
+                    .image(jsoupClient.fetchGearImage(providerId, extractGearImageSrc(x)))
+                    .size(extractGearSize(x))
+                    .build())
+        .collect(Collectors.toList());
   }
 
-  abstract Gear extractGearPrice(Element element);
+  abstract Elements filterToSearchResults(Document document);
 
-  abstract Gear extractGearDirectUrl(Element element);
+  abstract BigDecimal extractGearPrice(Element element);
 
-  abstract Gear extractGearBase64Image(Element element);
+  abstract String extractGearDirectUrl(Element element);
 
-  abstract Gear extractGearTitle(Element element);
+  abstract String extractGearImageSrc(Element element);
 
-  abstract Gear extractGearSize(Element element);
+  abstract String extractGearTitle(Element element);
+
+  abstract String extractGearSize(Element element);
 }

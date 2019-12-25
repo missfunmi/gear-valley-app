@@ -1,7 +1,10 @@
 package com.gearvalley.infrastructure;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.gearvalley.domain.models.SearchResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +26,14 @@ public class REIGearSearchClientTest {
 
   @Test
   public void testSearchWithRealText() {
-    reiGearSearchClient.searchForGearByKeyword("marmot precip jacket");
+    SearchResult searchResult = reiGearSearchClient.searchForGearByKeyword("marmot precip jacket");
+    assertThat(searchResult, notNullValue());
+    // TODO more assertions
   }
 
   @Test
   public void testSearchWithGibberish() {
     reiGearSearchClient.searchForGearByKeyword("saehtjjfkpalqdnopspdslnakpejfends");
+    // TODO real test
   }
 }

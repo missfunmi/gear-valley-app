@@ -11,12 +11,16 @@ interface ISearchPageState {
   loading: boolean;
   searchResult: ISearchResultWrapper | null;
 };
+interface IGearImage {
+  base64Image: string;
+  contentType: string;
+};
 interface IGear {
   title: string;
   price: number;
   size: string;
   url: string;
-  base64Image: string;
+  image: IGearImage
 };
 interface ISearchResult {
   providerId: string;
@@ -76,7 +80,7 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
         <p><a href={item.providerHomePage}>{item.providerName}</a></p>
         {item.gear.map((gear: IGear) => {
           return (
-            <p><img src={`data:image/png;charset=utf-8;base64, ${gear.base64Image}`}/><a href={gear.url}>{gear.title}</a> - {gear.price}</p>
+            <p><img src={`data:${gear.image.contentType};base64,${gear.image.base64Image}`}/><a href={gear.url}>{gear.title}</a> - ${gear.price}</p>
           )
         })}
       </div>

@@ -9,7 +9,7 @@ import lombok.Data;
 public class SearchResult {
   private String providerId;
   private String providerName;
-  private String providerHomePage;
+  private String providerHomePage;    // TODO rename to moreResultsURL
   private String providerLogo;
   private List<Gear> gear;
 

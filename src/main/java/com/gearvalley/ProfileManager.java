@@ -4,6 +4,7 @@ import java.util.Objects;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -14,18 +15,21 @@ public class ProfileManager {
   @Autowired private Environment environment;
 
   /**
-   * Sanity check to ensure we're not hitting real websites while in dev mode Will configure prod
-   * pipeline (or possibly master deploy?) to have active profiles = production
+   * TODO
+   * Temporary sanity check to prevent accidentally hitting real websites during local dev.
+   * Will configure pipeline (or possibly master deploy?) to have active profiles = prod
    */
-  private static final String EXPECTED_ACTIVE_PROFILE = "dev";
+  @Value("${application.expected.active.profile}")
+  private String expectedActiveProfile;
 
   @PostConstruct
   public void checkActiveProfiles() {
     for (String profileName : environment.getActiveProfiles()) {
       log.info("Currently active profile={}", profileName);
-      if (!Objects.equals(profileName, EXPECTED_ACTIVE_PROFILE)) {
-        throw new RuntimeException(
-            "Running a profile=" + profileName + " that is not dev. Is this intentional?");
+      if (!Objects.equals(profileName, expectedActiveProfile)) {
+        throw new UnsupportedOperationException(
+            "Running a profile=" + profileName + " that is not expectedActiveProfile="
+                + expectedActiveProfile + "! Is this intentional? Application will shut down.");
       }
     }
   }
