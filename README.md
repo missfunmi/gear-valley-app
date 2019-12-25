@@ -3,26 +3,35 @@ A price tracking app for gear shoppers.
 
 ## Local Development
 
-Run the server which serves api and ui using the following. Rebuilding the project hot reloads java changes:
+### Running the application
+Run the server which serves both the API and a front end using the following. Note that rebuilding the project hot reloads java changes:
 ```shell script
 mvn clean package
-mvn spring-boot:run
+mvn spring-boot:run -Drun.profiles=dev
 ```
 
-For debugging, it is probably easiest to run the spring boot application from the IDE by navigating to in the GearValleyApplication class and selecting Debug from the menu.
+### Debugging
+For debugging, it is probably easiest to run the spring boot application from the IDE by navigating to in the ``GearValleyApplication.java`` class and selecting Debug from the menu.
 
-You can also attach run spring boot in debug mode as follows and attach your debugger:
+You can also run spring boot in debug mode as follows and attach your debugger:
 ```shell script
 mvn spring-boot:run -Dagentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000
 ``` 
 
-For UI development with hot reload run the below command which should launch the app at http://localhost:3000:
+### UI Development
+For UI development with hot reload, run the below command which should launch the app at http://localhost:3000:
 
 *** N.B. This assumes you have `node` and `yarn` installed globally on you system ***
 
 ```shell script
 cd src/main/javascript/app
 yarn run start
-```
+```             
 
+### "Production" aka hitting live websites
+Production for now means hitting the real external site (as opposed to loading static HTML results from file). To run against the real site, set the following in ``application.properties``:
+```shell script 
+spring.profiles.active=prod
+application.expected.active.profile=prod
+```
 

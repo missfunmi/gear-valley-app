@@ -8,8 +8,8 @@ import lombok.Data;
 @Builder
 public class Gear {
   private String url;
-  private String base64Image;
+  private GearImage image;
   private String title;
-  private String size;
+  private String description;
   private BigDecimal price;
 }

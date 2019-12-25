@@ -11,12 +11,16 @@ interface ISearchPageState {
   loading: boolean;
   searchResult: ISearchResultWrapper | null;
 };
+interface IGearImage {
+  base64Image: string;
+  contentType: string;
+};
 interface IGear {
   title: string;
   price: number;
-  size: string;
+  description: string;
   url: string;
-  base64Image: string;
+  image: IGearImage
 };
 interface ISearchResult {
   providerId: string;
@@ -44,7 +48,14 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
     this.setState({loading: true, error: null});
     try {
       const request = { keyword: searchTerm };
-      const res = await fetch('api/v1/search', { method: 'POST', body: JSON.stringify(request)});
+      const res = await fetch('api/v1/search', {
+        method: 'POST',
+        body: JSON.stringify(request),
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
       const json = await res.json();
       this.setState({searchResult: json, loading: false});
     } catch(err) {
@@ -69,7 +80,7 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
         <p><a href={item.providerHomePage}>{item.providerName}</a></p>
         {item.gear.map((gear: IGear) => {
           return (
-            <p><img src={`data:image/png;charset=utf-8;base64, ${gear.base64Image}`}/><a href={gear.url}>{gear.title}</a> - {gear.price}</p>
+            <p><img src={`data:${gear.image.contentType};base64,${gear.image.base64Image}`} alt={gear.title}/><a href={gear.url}>{gear.title}</a> ({gear.description}) - ${gear.price}</p>
           )
         })}
       </div>

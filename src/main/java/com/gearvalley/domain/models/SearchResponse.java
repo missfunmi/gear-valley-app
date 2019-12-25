@@ -9,5 +9,6 @@ import lombok.Data;
 public class SearchResponse {
   private String keyword;
   private List<SearchResult> results;
+  // TODO add timestamp of search response
 
 }

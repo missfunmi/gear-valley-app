@@ -7,12 +7,13 @@ import com.google.common.io.Resources;
 import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("test")
 @Slf4j
 public class MockSearchService implements SearchService {
-
   private final ObjectMapper objectMapper;
   private final SearchResponse mockSearchResponse;
   private static final String SEARCH_RESPONSE_FILE = "mocks/search-results.json";
