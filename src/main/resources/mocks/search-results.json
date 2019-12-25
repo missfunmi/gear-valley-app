@@ -10,7 +10,7 @@
         {
           "url": "https://www.rei.com/product/85201/marmot-weslo-insulated-jacket-mens",
           "title": "Marmot Weslo Insulated Jacket - Men's",
-          "size": "L",
+          "description": "L",
           "price": 95.99,
           "image": {
             "base64Image": "YTM0NZomIzI2OTsmIzM0NTueYQ==",
@@ -20,7 +20,7 @@
         {
           "url": "https://www.rei.com/product/145201/marmot-weslo-insulated-jacket-mens",
           "title": "Marmot Weslo Insulated Jacket - Kid's",
-          "size": "M",
+          "description": "M",
           "price": 82.99,
           "image": {
             "base64Image": "YTM0NZomIzI2OTsmIzM0NTueYQ==",
@@ -30,7 +30,7 @@
         {
           "url": "https://www.rei.com/product/135201/marmot-weslo-insulated-jacket-mens",
           "title": "Marmot Weslo Insulated Jacket - Women's",
-          "size": "S",
+          "description": "S",
           "price": 47.99,
           "image": {
             "base64Image": "YTM0NZomIzI2OTsmIzM0NTueYQ==",
