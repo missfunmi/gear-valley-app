@@ -14,11 +14,6 @@ public class ProfileManager {
 
   @Autowired private Environment environment;
 
-  /**
-   * TODO
-   * Temporary sanity check to prevent accidentally hitting real websites during local dev.
-   * Will configure pipeline (or possibly master deploy?) to have active profiles = prod
-   */
   @Value("${application.expected.active.profile}")
   private String expectedActiveProfile;
 
@@ -28,8 +23,11 @@ public class ProfileManager {
       log.info("Currently active profile={}", profileName);
       if (!Objects.equals(profileName, expectedActiveProfile)) {
         throw new UnsupportedOperationException(
-            "Running a profile=" + profileName + " that is not expectedActiveProfile="
-                + expectedActiveProfile + "! Is this intentional? Application will shut down.");
+            "Running a profile="
+                + profileName
+                + " that is not expectedActiveProfile="
+                + expectedActiveProfile
+                + "! Is this intentional? Application will shut down.");
       }
     }
   }

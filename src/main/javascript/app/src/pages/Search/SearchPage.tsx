@@ -18,7 +18,7 @@ interface IGearImage {
 interface IGear {
   title: string;
   price: number;
-  size: string;
+  description: string;
   url: string;
   image: IGearImage
 };
@@ -80,7 +80,7 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
         <p><a href={item.providerHomePage}>{item.providerName}</a></p>
         {item.gear.map((gear: IGear) => {
           return (
-            <p><img src={`data:${gear.image.contentType};base64,${gear.image.base64Image}`}/><a href={gear.url}>{gear.title}</a> - ${gear.price}</p>
+            <p><img src={`data:${gear.image.contentType};base64,${gear.image.base64Image}`} alt={gear.title}/><a href={gear.url}>{gear.title}</a> ({gear.description}) - ${gear.price}</p>
           )
         })}
       </div>

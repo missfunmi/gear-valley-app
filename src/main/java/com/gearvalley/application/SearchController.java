@@ -26,6 +26,7 @@ public class SearchController {
   public ResponseEntity<SearchResponse> search(@RequestBody SearchRequest searchRequest) {
     log.info("Searching with searchRequest={}", searchRequest);
     SearchResponse searchResponse = searchService.search(searchRequest);
+    log.info("Returning searchResponse={}", searchResponse);
     return ResponseEntity.ok(searchResponse);
   }
 

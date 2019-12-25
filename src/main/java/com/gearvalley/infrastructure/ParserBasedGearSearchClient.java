@@ -30,7 +30,7 @@ public abstract class ParserBasedGearSearchClient implements GearSiteSearchClien
                     .title(extractGearTitle(x))
                     .url(extractGearDirectUrl(x))
                     .image(jsoupClient.fetchGearImage(providerId, extractGearImageSrc(x)))
-                    .size(extractGearSize(x))
+                    .description(extractGearDescription(x))
                     .build())
         .collect(Collectors.toList());
   }
@@ -45,5 +45,5 @@ public abstract class ParserBasedGearSearchClient implements GearSiteSearchClien
 
   abstract String extractGearTitle(Element element);
 
-  abstract String extractGearSize(Element element);
+  abstract String extractGearDescription(Element element);
 }

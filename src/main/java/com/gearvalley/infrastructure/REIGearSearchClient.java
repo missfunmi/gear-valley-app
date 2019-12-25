@@ -27,7 +27,7 @@ public class REIGearSearchClient extends ParserBasedGearSearchClient {
   @Override
   public SearchResult searchForGearByKeyword(String keyword) {
     List<Gear> gear = searchForGear(PROVIDER_ID, keyword);
-    log.info("Found {} gear={} for keyword={} at source={}", gear.size(), gear, keyword, PROVIDER_ID);
+    log.info("Searched by keyword={} at source={} and found {} gear={}", keyword, PROVIDER_ID, gear.size(), gear);
     
     return SearchResult.builder()
         .providerId(PROVIDER_ID) // TODO -- should be a UUID?
@@ -94,13 +94,12 @@ public class REIGearSearchClient extends ParserBasedGearSearchClient {
   }
 
   @Override
-  // TODO Holding metadata - needs to be renamed
-  String extractGearSize(Element element) {
-    String size =
+  String extractGearDescription(Element element) {
+    String description =
         element
             .select("li > a > span")
             .text();
-    log.info("Extracted metadata={}", size);
-    return size;
+    log.info("Extracted description={}", description);
+    return description;
   }
 }

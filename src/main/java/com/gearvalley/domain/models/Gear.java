@@ -10,6 +10,6 @@ public class Gear {
   private String url;
   private GearImage image;
   private String title;
-  private String size;
+  private String description;
   private BigDecimal price;
 }
