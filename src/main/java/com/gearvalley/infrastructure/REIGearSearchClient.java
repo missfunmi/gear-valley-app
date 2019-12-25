@@ -1,50 +1,60 @@
 package com.gearvalley.infrastructure;
 
+import com.gearvalley.domain.models.Gear;
 import com.gearvalley.domain.models.SearchResult;
-import java.math.BigDecimal;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Slf4j
+@Service
 public class REIGearSearchClient extends ParserBasedGearSearchClient {
 
-  private String siteUrlBase = "https://www.rei.com/search?q=%s&pagesize=90";
+  private static final String PROVIDER_ID = "REI";
   private static final String SEARCH_RESULTS_ID = "search-results";
+
+  @Autowired
+  public REIGearSearchClient(JsoupClient jsoupClient) {
+    super(jsoupClient);
+  }
 
   @Override
   public SearchResult searchForGearByKeyword(String keyword) {
-    Elements elements = searchForGear(keyword);
+    Elements elements = searchForGear(PROVIDER_ID, keyword, SEARCH_RESULTS_ID);
 
-    // Convert each Element to a Gear
+    return SearchResult.builder()
+        .providerId(PROVIDER_ID) // TODO -- should be a UUID?
+        .providerName(PROVIDER_ID)
+        .gear(Lists.newArrayList()) // TODO -- Convert each Element above to a Gear
+        .providerHomePage("https://rei.com") // TODO -- Could likely get rid of this field...
+        .build();
+  }
 
-    // Populate SearchResult
-
+  @Override
+  Gear extractGearPrice(Element element) {
     return null;
   }
 
   @Override
-  BigDecimal extractGearPrice(Element element) {
+  Gear extractGearDirectUrl(Element element) {
     return null;
   }
 
   @Override
-  String extractGearDirectUrl(Element element) {
+  Gear extractGearBase64Image(Element element) {
     return null;
   }
 
   @Override
-  String extractGearBase64Image(Element element) {
+  Gear extractGearTitle(Element element) {
     return null;
   }
 
   @Override
-  String extractGearTitle(Element element) {
-    return null;
-  }
-
-  @Override
-  String extractGearSize(Element element) {
+  Gear extractGearSize(Element element) {
     return null;
   }
 }

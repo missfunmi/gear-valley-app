@@ -7,7 +7,7 @@ A price tracking app for gear shoppers.
 Run the server which serves both the API and a front end using the following. Note that rebuilding the project hot reloads java changes:
 ```shell script
 mvn clean package
-mvn spring-boot:run
+mvn spring-boot:run -Drun.profiles=dev
 ```
 
 ### Debugging
