@@ -7,8 +7,9 @@ import { SearchPage } from './pages/Search'
 
 const logoTextStyles: ITextStyles = {
   root: {
-    fontSize: FontSizes.size24,
-    fontWeight: FontWeights.bold
+    fontSize: FontSizes.size18,
+    fontWeight: FontWeights.bold,
+    textTransform: 'uppercase'
   }
 };
 const stackTokens: IStackTokens = {
@@ -20,7 +21,7 @@ const App: React.FC = () => {
     <div className="App">
       <header>
         <Stack tokens={stackTokens}>
-          <Text styles={logoTextStyles}>Gear Valley</Text>
+          <Text styles={logoTextStyles}>Gear Valley.</Text>
         </Stack>
       </header>
       <SearchPage/>
