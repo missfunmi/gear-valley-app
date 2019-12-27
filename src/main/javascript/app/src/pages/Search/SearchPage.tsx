@@ -1,75 +1,61 @@
-import React from 'react';
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
-import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
-import { SearchBox, ISearchBoxStyles } from 'office-ui-fabric-react/lib/SearchBox';
-import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
-import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack';
-import { ISearchResult, ISearchResultWrapper } from 'types';
-import { SearchResult } from 'components/Search';
-
-interface ISearchPageProps {};
-interface ISearchPageState {
-  error: string | null;
-  loading: boolean;
-  searchResult: ISearchResultWrapper | null;
-};
+import React, { useState } from 'react'
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar'
+import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot'
+import { SearchBox, ISearchBoxStyles } from 'office-ui-fabric-react/lib/SearchBox'
+import { Spinner } from 'office-ui-fabric-react/lib/Spinner'
+import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack'
+import { FetchStatus } from 'types/enums'
+import { IAddWatchRequest, IGear, ISearchResult } from 'types'
+import { SearchResult } from 'components/Search'
+import { useSearchService } from 'services'
 
 const stackTokens: IStackTokens = {
   childrenGap: 5,
-  padding: 10
-};
+  padding: 10,
+}
 
 const searchInputStyles: ISearchBoxStyles = {
   root: {
-    fontSize: 16
-  }
-};
-
-
+    fontSize: 16,
+  },
+}
 
 // tslint:disable:jsx-no-lambda
-class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
-  constructor(props: ISearchPageProps) {
-    super(props);
-    this.state = {
-      error: null,
-      loading: false,
-      searchResult: null
-    };
-  }
-
-  handleSearch = async (searchTerm: string) => {
-    this.setState({loading: true, error: null});
+const SearchPage: React.FC = () => {
+  const [keyword, setKeyword] = useState<string>('')
+  const searchResponse = useSearchService(keyword)
+  const [showError, setShowError] = useState<boolean>(true)
+  const handleAddWatch = async (result: ISearchResult, gear: IGear) => {
     try {
-      const request = { keyword: searchTerm };
-      const res = await fetch('api/v1/search', {
+      const addWatchRequest: IAddWatchRequest = {
+        keyword: keyword,
+        providerId: result.providerId,
+        gear: gear,
+      }
+      const res = await fetch('api/v1/priceWatches', {
         method: 'POST',
-        body: JSON.stringify(request),
+        body: JSON.stringify(addWatchRequest),
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
-        }
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        console.error(json);
-        throw new Error('Error fetching results')
-      }
-      this.setState({searchResult: json, loading: false});
-    } catch(err) {
-      console.error(err)
-      this.setState({
-        error: err,
-        loading: false
+        },
       })
+      const json = await res.json()
+      if (!res.ok) {
+        console.error(json)
+        throw new Error('Error adding price watch')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Error adding price watch')
     }
   }
 
-  handleErrorDismiss = () => {
-    this.setState({error: null});
+  const handleErrorDismiss = () => {
+    setShowError(false)
   }
 
-  renderLoader() {
+  const renderLoader = () => {
     return (
       <div>
         <Spinner label="Searching for your gear..." ariaLive="assertive" labelPosition="top" />
@@ -77,22 +63,25 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
     )
   }
 
-  renderItem(result: ISearchResult) {
+  const renderItem = (result: ISearchResult) => {
     return (
-      <PivotItem headerText={`${result.providerName} (${result.gear.length})`}>
-        <div style={{marginTop: 12}}>
-        <SearchResult result={result} />
+      <PivotItem
+        headerText={`${result.providerName} (${result.gear.length})`}
+        key={result.providerId}
+      >
+        <div style={{ marginTop: 12 }}>
+          <SearchResult result={result} onAddPriceWatch={handleAddWatch} />
         </div>
       </PivotItem>
     )
   }
 
-  renderError(error: any) {
+  const renderError = (error: any) => {
     return (
       <MessageBar
         messageBarType={MessageBarType.error}
         isMultiline={false}
-        onDismiss={this.handleErrorDismiss}
+        onDismiss={handleErrorDismiss}
         dismissButtonAriaLabel="Close"
       >
         Well that's embarrassing. There was an error fetching your result. Try again or contact us.
@@ -100,29 +89,28 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
     )
   }
 
-  public render(): JSX.Element {
-    const { error, loading, searchResult } = this.state;
-    return (
-      <Stack tokens={stackTokens}>
-        <SearchBox
-          placeholder="Search"
-          onSearch={this.handleSearch}
-          styles={searchInputStyles}
-          onFocus={() => console.log('onFocus called')}
-          onBlur={() => console.log('onBlur called')}
-          onChange={() => console.log('onChange called')}
-        />
-        {error && this.renderError(error)}
-        {loading && this.renderLoader()}
-        {searchResult && <p>Results for "<b>{searchResult.keyword}</b>"</p>}
-        {searchResult && (
-          <Pivot aria-label="Search Results">
-            {searchResult.results.map(this.renderItem)}
-          </Pivot>
-        )}
-      </Stack>
-    );
-  }
+  return (
+    <Stack tokens={stackTokens}>
+      <SearchBox
+        placeholder="Search"
+        onSearch={(keyword: string) => setKeyword(keyword)}
+        onClear={() => setKeyword('')}
+        styles={searchInputStyles}
+      />
+      {searchResponse.status === FetchStatus.Error &&
+        showError &&
+        renderError(searchResponse.error)}
+      {searchResponse.status === FetchStatus.Loading && renderLoader()}
+      {searchResponse.status === FetchStatus.Loaded && searchResponse.data && (
+        <>
+          <p>
+            Results for "<b>{searchResponse.data?.keyword}</b>"
+          </p>
+          <Pivot aria-label="Search Results">{searchResponse.data?.results?.map(renderItem)}</Pivot>
+        </>
+      )}
+    </Stack>
+  )
 }
 
-export default SearchPage;
+export default SearchPage

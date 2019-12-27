@@ -1,20 +1,20 @@
-import React from 'react';
-import { IImageProps, Image, ImageFit } from 'office-ui-fabric-react/lib/Image';
+import React from 'react'
+import { IImageProps, Image, ImageFit } from 'office-ui-fabric-react/lib/Image'
 import { IImage } from 'types'
 
-interface ISearchResultImageProps {
-  image: IImage;
+interface IGearCardImageProps {
+  image: IImage
   alt?: string
-};
+}
 
 const imageProps: Partial<IImageProps> = {
   imageFit: ImageFit.centerContain,
   width: 96,
-  height: 96
-};
+  height: 96,
+}
 
 // tslint:disable:jsx-no-lambda
-export const SearchResultImage: React.FC<ISearchResultImageProps> = ({image, alt}) => {
+export const GearCardImage: React.FC<IGearCardImageProps> = ({ image, alt }) => {
   return (
     <Image
       {...imageProps}
