@@ -26,6 +26,7 @@ public class PriceWatch {
   private String title;
   private String description;
   private String providerId;
+  private String url;
   private Instant lastPriceCheck;
   private BigDecimal currentPrice;
   private BigDecimal startingPrice;

@@ -37,6 +37,7 @@ public class DefaultPriceWatchService implements PriceWatchService {
             .title(priceWatchAddRequest.getGear().getTitle())
             .description(priceWatchAddRequest.getGear().getDescription())
             .providerId(priceWatchAddRequest.getProviderId())
+            .url(priceWatchAddRequest.getGear().getUrl())
             .lastPriceCheck(Instant.now())
             .currentPrice(priceWatchAddRequest.getGear().getPrice())
             .startingPrice(priceWatchAddRequest.getGear().getPrice())
