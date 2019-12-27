@@ -1,7 +1,7 @@
 package com.gearvalley.domain.models;
 
-import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString.Exclude;
@@ -27,9 +27,8 @@ public class PriceWatch {
   private String description;
   private String providerId;
   private String url;
-  private Instant lastPriceCheck;
-  private BigDecimal currentPrice;
-  private BigDecimal startingPrice;
+  private PriceDetail currentPrice;
+  private List<PriceDetail> priceHistory;
   private boolean isActive;
   @Exclude
   private GearImage image;
