@@ -3,7 +3,10 @@ package com.gearvalley.application;
 import com.gearvalley.domain.SearchService;
 import com.gearvalley.domain.models.SearchRequest;
 import com.gearvalley.domain.models.SearchResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,11 +26,11 @@ public class SearchController {
   }
 
   @PostMapping
-  public ResponseEntity<SearchResponse> search(@RequestBody SearchRequest searchRequest) {
+  public ResponseEntity<SearchResponse> search(
+      @RequestBody @Valid @NotNull SearchRequest searchRequest) {
     log.info("Searching with searchRequest={}", searchRequest);
-    SearchResponse searchResponse = searchService.search(searchRequest);
+    var searchResponse = searchService.search(searchRequest);
     log.info("Returning searchResponse={}", searchResponse);
     return ResponseEntity.ok(searchResponse);
   }
-
 }

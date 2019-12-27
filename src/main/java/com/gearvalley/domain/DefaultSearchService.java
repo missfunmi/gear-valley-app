@@ -20,7 +20,6 @@ public class DefaultSearchService implements SearchService {
 
   @Override
   public SearchResponse search(SearchRequest searchRequest) {
-    SearchResponse response = gearSiteSearchFacade.searchGearSites(searchRequest);
-    return response;
+    return gearSiteSearchFacade.searchGearSites(searchRequest);
   }
 }
