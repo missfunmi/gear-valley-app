@@ -1,0 +1,118 @@
+{
+	"info": {
+		"_postman_id": "761e2376-0985-447e-958f-64a4549308a7",
+		"name": "Gear Valley App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Search for Gear",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"keyword\": \"Marmot Weslo Insulated\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/search",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Watch",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"keyword\": \"Marmot Weslo Insulated\",\n  \"watchItems\": [\n  \t{\n  \t\t\"providerId\": \"REI\",\n  \t\t\"url\": \"/rei-garage/product/163642/marmot-precip-eco-jacket-girls\",\n  \t\t\"title\": \"Marmot PreCip Eco Jacket - Women's\",\n  \t\t\"description\": \"6 colors available\",\n  \t\t\"price\": 69.73\n  \t}\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/watches",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"watches"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Watches",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"keyword\": \"Marmot Weslo Insulated\",\n  \"watchItems\": [\n  \t{\n  \t\t\"providerId\": \"REI\",\n  \t\t\"url\": \"/rei-garage/product/163642/marmot-precip-eco-jacket-girls\",\n  \t\t\"title\": \"Marmot PreCip Eco Jacket - Women's\",\n  \t\t\"description\": \"6 colors available\",\n  \t\t\"price\": 69.73\n  \t}\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/watches",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"watches"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
