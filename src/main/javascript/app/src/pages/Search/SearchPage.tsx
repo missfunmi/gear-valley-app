@@ -1,7 +1,7 @@
 import React from 'react';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
-import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
+import { SearchBox, ISearchBoxStyles } from 'office-ui-fabric-react/lib/SearchBox';
 import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
 import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack';
 import { ISearchResult, ISearchResultWrapper } from 'types';
@@ -18,6 +18,14 @@ const stackTokens: IStackTokens = {
   childrenGap: 5,
   padding: 10
 };
+
+const searchInputStyles: ISearchBoxStyles = {
+  root: {
+    fontSize: 16
+  }
+};
+
+
 
 // tslint:disable:jsx-no-lambda
 class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
@@ -99,6 +107,7 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
         <SearchBox
           placeholder="Search"
           onSearch={this.handleSearch}
+          styles={searchInputStyles}
           onFocus={() => console.log('onFocus called')}
           onBlur={() => console.log('onBlur called')}
           onChange={() => console.log('onChange called')}
