@@ -64,6 +64,11 @@ public class DefaultPriceWatchService implements PriceWatchService {
   }
 
   @Override
+  public List<PriceWatch> fetchWatchesByProviderIdAndUrl(String providerId, String url) {
+    return priceWatchRepository.findByProviderIdAndUrl(providerId, url);
+  }
+
+  @Override
   public PriceWatch deleteWatch(String watchId) {
     var deletedWatches = priceWatchRepository.deleteByWatchId(watchId);
     if (CollectionUtils.isEmpty(deletedWatches)) {

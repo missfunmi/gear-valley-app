@@ -1,5 +1,6 @@
 package com.gearvalley.infrastructure;
 
+import com.gearvalley.domain.PriceWatchService;
 import com.gearvalley.domain.models.Gear;
 import com.gearvalley.domain.models.SearchResult;
 import java.math.BigDecimal;
@@ -20,15 +21,20 @@ public class REIGearSearchClient extends ParserBasedGearSearchClient {
   private static final String SEARCH_RESULTS_ID = "search-results";
 
   @Autowired
-  public REIGearSearchClient(JsoupClient jsoupClient) {
-    super(jsoupClient);
+  public REIGearSearchClient(JsoupClient jsoupClient, PriceWatchService priceWatchService) {
+    super(jsoupClient, priceWatchService);
   }
 
   @Override
   public SearchResult searchForGearByKeyword(String keyword) {
     List<Gear> gear = searchForGear(PROVIDER_ID, keyword);
-    log.info("Searched by keyword={} at source={} and found {} gear={}", keyword, PROVIDER_ID, gear.size(), gear);
-    
+    log.info(
+        "Searched by keyword={} at source={} and found {} gear={}",
+        keyword,
+        PROVIDER_ID,
+        gear.size(),
+        gear);
+
     return SearchResult.builder()
         .providerId(PROVIDER_ID) // TODO -- should be a UUID?
         .providerName(PROVIDER_ID)
@@ -63,42 +69,28 @@ public class REIGearSearchClient extends ParserBasedGearSearchClient {
 
   @Override
   String extractGearDirectUrl(Element element) {
-    String directUrl =
-        element
-            .select("li > a")
-            .get(0)
-            .attr("href");
+    String directUrl = element.select("li > a").get(0).attr("href");
     log.info("Extracted directUrl={}", directUrl);
     return directUrl;
   }
 
   @Override
   String extractGearImageSrc(Element element) {
-    String relativePathToImage =
-        element
-            .select("li > a > div img")
-            .get(0)
-            .attr("src");
+    String relativePathToImage = element.select("li > a > div img").get(0).attr("src");
     log.info("Extracted relativePathToImage={}", relativePathToImage);
     return relativePathToImage;
   }
 
   @Override
   String extractGearTitle(Element element) {
-    String title =
-        element
-            .select("li > a > h2 > div")
-            .text();
+    String title = element.select("li > a > h2 > div").text();
     log.info("Extracted title={}", title);
     return title;
   }
 
   @Override
   String extractGearDescription(Element element) {
-    String description =
-        element
-            .select("li > a > span")
-            .text();
+    String description = element.select("li > a > span").text();
     log.info("Extracted description={}", description);
     return description;
   }

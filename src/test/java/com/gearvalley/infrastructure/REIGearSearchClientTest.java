@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.gearvalley.domain.PriceWatchService;
 import com.gearvalley.domain.models.SearchResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,13 @@ import org.springframework.test.context.ActiveProfiles;
 public class REIGearSearchClientTest {
 
   @Autowired private JsoupClient jsoupClient;
+  @Autowired private PriceWatchService priceWatchService;
   private REIGearSearchClient reiGearSearchClient;
 
   @BeforeEach
   public void setUp() {
     assertTrue(jsoupClient instanceof MockJsoupClient);
-    reiGearSearchClient = new REIGearSearchClient(jsoupClient);
+    reiGearSearchClient = new REIGearSearchClient(jsoupClient, priceWatchService);
   }
 
   @Test
