@@ -8,6 +8,7 @@ import { ISearchResult, ISearchResultWrapper } from 'types';
 import { SearchResult } from 'components/Search';
 
 interface ISearchPageProps {};
+
 interface ISearchPageState {
   error: string | null;
   loading: boolean;
@@ -24,8 +25,6 @@ const searchInputStyles: ISearchBoxStyles = {
     fontSize: 16
   }
 };
-
-
 
 // tslint:disable:jsx-no-lambda
 class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
@@ -108,9 +107,6 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
           placeholder="Search"
           onSearch={this.handleSearch}
           styles={searchInputStyles}
-          onFocus={() => console.log('onFocus called')}
-          onBlur={() => console.log('onBlur called')}
-          onChange={() => console.log('onChange called')}
         />
         {error && this.renderError(error)}
         {loading && this.renderLoader()}
