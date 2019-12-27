@@ -1,9 +1,11 @@
 import React from 'react';
-import { List } from 'office-ui-fabric-react/lib/List';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
+import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
-import { Stack } from 'office-ui-fabric-react/lib/Stack';
-import './SearchPage.css';
+import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack';
+import { ISearchResult, ISearchResultWrapper } from 'types';
+import { SearchResult } from 'components/Search';
 
 interface ISearchPageProps {};
 interface ISearchPageState {
@@ -11,28 +13,12 @@ interface ISearchPageState {
   loading: boolean;
   searchResult: ISearchResultWrapper | null;
 };
-interface IGearImage {
-  base64Image: string;
-  contentType: string;
+
+const stackTokens: IStackTokens = {
+  childrenGap: 5,
+  padding: 10
 };
-interface IGear {
-  title: string;
-  price: number;
-  description: string;
-  url: string;
-  image: IGearImage
-};
-interface ISearchResult {
-  providerId: string;
-  providerName: string;
-  providerHomePage: string;
-  providerLogo: string;
-  gear: Array<IGear>
-};
-interface ISearchResultWrapper {
-  keyword: string;
-  results: Array<ISearchResult>
-};
+
 // tslint:disable:jsx-no-lambda
 class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
   constructor(props: ISearchPageProps) {
@@ -57,13 +43,22 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
         }
       });
       const json = await res.json();
+      if (!res.ok) {
+        console.error(json);
+        throw new Error('Error fetching results')
+      }
       this.setState({searchResult: json, loading: false});
     } catch(err) {
+      console.error(err)
       this.setState({
         error: err,
         loading: false
       })
     }
+  }
+
+  handleErrorDismiss = () => {
+    this.setState({error: null});
   }
 
   renderLoader() {
@@ -74,23 +69,33 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
     )
   }
 
-  renderResult(item?: ISearchResult) {
-    return (item &&
-      <div>
-        <p><a href={item.providerHomePage}>{item.providerName}</a></p>
-        {item.gear.map((gear: IGear) => {
-          return (
-            <p><img src={`data:${gear.image.contentType};base64,${gear.image.base64Image}`} alt={gear.title}/><a href={gear.url}>{gear.title}</a> ({gear.description}) - ${gear.price}</p>
-          )
-        })}
-      </div>
+  renderItem(result: ISearchResult) {
+    return (
+      <PivotItem headerText={`${result.providerName} (${result.gear.length})`}>
+        <div style={{marginTop: 12}}>
+        <SearchResult result={result} />
+        </div>
+      </PivotItem>
+    )
+  }
+
+  renderError(error: any) {
+    return (
+      <MessageBar
+        messageBarType={MessageBarType.error}
+        isMultiline={false}
+        onDismiss={this.handleErrorDismiss}
+        dismissButtonAriaLabel="Close"
+      >
+        Well that's embarrassing. There was an error fetching your result. Try again or contact us.
+      </MessageBar>
     )
   }
 
   public render(): JSX.Element {
     const { error, loading, searchResult } = this.state;
     return (
-      <Stack tokens={{ childrenGap: 20, padding: 10 }}>
+      <Stack tokens={stackTokens}>
         <SearchBox
           placeholder="Search"
           onSearch={this.handleSearch}
@@ -98,10 +103,14 @@ class SearchPage extends React.Component<ISearchPageProps, ISearchPageState> {
           onBlur={() => console.log('onBlur called')}
           onChange={() => console.log('onChange called')}
         />
+        {error && this.renderError(error)}
         {loading && this.renderLoader()}
-        {searchResult && <p>Results for "{searchResult.keyword}"</p>}
-        {searchResult && <List items={searchResult.results} onRenderCell={this.renderResult} />}
-        {error && <p>{JSON.stringify(error)}</p>}
+        {searchResult && <p>Results for "<b>{searchResult.keyword}</b>"</p>}
+        {searchResult && (
+          <Pivot aria-label="Search Results">
+            {searchResult.results.map(this.renderItem)}
+          </Pivot>
+        )}
       </Stack>
     );
   }
