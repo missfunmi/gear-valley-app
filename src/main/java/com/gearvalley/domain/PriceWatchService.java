@@ -13,5 +13,7 @@ public interface PriceWatchService {
 
   Optional<PriceWatch> fetchWatchById(String watchId);
 
+  List<PriceWatch> fetchWatchesByProviderIdAndUrl(String providerId, String url);
+
   PriceWatch deleteWatch(String watchId);
 }

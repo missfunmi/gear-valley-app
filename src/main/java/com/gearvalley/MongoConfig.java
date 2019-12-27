@@ -1,5 +1,6 @@
 package com.gearvalley;
 
+import com.gearvalley.domain.models.PriceWatch;
 import com.gearvalley.infrastructure.PriceWatchRepository;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -12,15 +13,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.WriteResultChecking;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
-import org.springframework.data.mongodb.core.index.IndexResolver;
-import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver;
-import org.springframework.data.mongodb.core.mapping.BasicMongoPersistentEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
@@ -60,24 +58,13 @@ public class MongoConfig {
     log.info("Initializing indices post application startup...");
     var start = System.currentTimeMillis();
 
-    var mappingContext = this.mongoTemplate().getConverter().getMappingContext();
-    if (mappingContext instanceof MongoMappingContext) {
-      MongoMappingContext mongoMappingContext = (MongoMappingContext) mappingContext;
-      for (BasicMongoPersistentEntity<?> persistentEntity :
-          mongoMappingContext.getPersistentEntities()) {
-        var clazz = persistentEntity.getType();
-        if (clazz.isAnnotationPresent(Document.class)) {
-          IndexOperations indexOps = mongoTemplate().indexOps(clazz);
-          IndexResolver resolver = new MongoPersistentEntityIndexResolver(mongoMappingContext);
-          resolver.resolveIndexFor(clazz).forEach(indexOps::ensureIndex);
-          log.debug(
-              "Collection={} in database={} has indices={}",
-              persistentEntity.getCollection(),
-              database,
-              indexOps.getIndexInfo());
-        }
-      }
-    }
+    IndexOperations indexOperations = mongoTemplate().indexOps(PriceWatch.class);
+    indexOperations.ensureIndex(new Index("watchId", Direction.ASC).unique());
+    indexOperations.ensureIndex(new Index("url", Direction.ASC));
+    log.debug(
+        "Collection=PriceWatch in database={} has indices={}",
+        database,
+        indexOperations.getIndexInfo());
 
     log.info("Completed index resolution in {}ms", (System.currentTimeMillis() - start));
   }
