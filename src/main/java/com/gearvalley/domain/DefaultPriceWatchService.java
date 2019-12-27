@@ -1,13 +1,16 @@
 package com.gearvalley.domain;
 
+import com.gearvalley.domain.models.PriceDetail;
 import com.gearvalley.domain.models.PriceWatch;
 import com.gearvalley.domain.models.PriceWatchAddRequest;
 import com.gearvalley.infrastructure.PriceWatchRepository;
+import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +32,11 @@ public class DefaultPriceWatchService implements PriceWatchService {
   }
 
   @Override
-  public PriceWatch addWatch(PriceWatchAddRequest priceWatchAddRequest) {
+  public PriceWatch addWatch(@NonNull PriceWatchAddRequest priceWatchAddRequest) {
+    PriceDetail currentPrice = PriceDetail.builder()
+        .price(priceWatchAddRequest.getGear().getPrice())
+        .dateOfCheck(Instant.now())
+        .build();
     PriceWatch priceWatch =
         PriceWatch.builder()
             .watchId(randomWatchId())
@@ -38,9 +45,8 @@ public class DefaultPriceWatchService implements PriceWatchService {
             .description(priceWatchAddRequest.getGear().getDescription())
             .providerId(priceWatchAddRequest.getProviderId())
             .url(priceWatchAddRequest.getGear().getUrl())
-            .lastPriceCheck(Instant.now())
-            .currentPrice(priceWatchAddRequest.getGear().getPrice())
-            .startingPrice(priceWatchAddRequest.getGear().getPrice())
+            .currentPrice(currentPrice)
+            .priceHistory(Lists.newArrayList(currentPrice))
             .isActive(true)
             .image(priceWatchAddRequest.getGear().getImage())
             .build();
@@ -66,7 +72,7 @@ public class DefaultPriceWatchService implements PriceWatchService {
     }
     if (deletedWatches.size() > 1) {
       throw new MongoException(
-          "Unexpectedly found and deleted more than 1 watch for the same watchId! Here are the watches deleted: "
+          "Unexpectedly found and deleted more than 1 watch for the same watchId! deletedWatches="
               + deletedWatches);
     }
     return deletedWatches.get(0);
