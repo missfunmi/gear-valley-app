@@ -5,7 +5,6 @@ import com.gearvalley.domain.models.PriceWatch;
 import com.gearvalley.domain.models.PriceWatchAddRequest;
 import com.gearvalley.infrastructure.PriceWatchRepository;
 import com.google.common.collect.Lists;
-import com.mongodb.MongoException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -33,10 +32,11 @@ public class DefaultPriceWatchService implements PriceWatchService {
 
   @Override
   public PriceWatch addWatch(@NonNull PriceWatchAddRequest priceWatchAddRequest) {
-    PriceDetail currentPrice = PriceDetail.builder()
-        .price(priceWatchAddRequest.getGear().getPrice())
-        .dateOfCheck(Instant.now())
-        .build();
+    PriceDetail currentPrice =
+        PriceDetail.builder()
+            .price(priceWatchAddRequest.getGear().getPrice())
+            .dateOfCheck(Instant.now())
+            .build();
     PriceWatch priceWatch =
         PriceWatch.builder()
             .watchId(randomWatchId())
@@ -47,7 +47,7 @@ public class DefaultPriceWatchService implements PriceWatchService {
             .url(priceWatchAddRequest.getGear().getUrl())
             .currentPrice(currentPrice)
             .priceHistory(Lists.newArrayList(currentPrice))
-            .isActive(true)
+            .active(true)
             .image(priceWatchAddRequest.getGear().getImage())
             .build();
     return priceWatchRepository.save(priceWatch);
@@ -59,28 +59,47 @@ public class DefaultPriceWatchService implements PriceWatchService {
   }
 
   @Override
-  public Optional<PriceWatch> fetchWatchById(String watchId) {
-    return priceWatchRepository.findByWatchId(watchId);
-  }
-
-  @Override
   public List<PriceWatch> fetchWatchesByProviderIdAndUrl(String providerId, String url) {
     return priceWatchRepository.findByProviderIdAndUrl(providerId, url);
   }
 
   @Override
-  public PriceWatch deleteWatch(String watchId) {
+  public Optional<PriceWatch> fetchWatchById(String watchId) {
+    return priceWatchRepository.findByWatchId(watchId);
+  }
+
+  @Override
+  public Optional<PriceWatch> activateWatch(String watchId) {
+    var existingWatch = priceWatchRepository.findByWatchId(watchId);
+    if (!existingWatch.isPresent()) {
+      return Optional.empty();
+    }
+    PriceWatch watchToActivate = existingWatch.get().activate();
+    return Optional.of(priceWatchRepository.save(watchToActivate));
+  }
+
+  @Override
+  public Optional<PriceWatch> deActivateWatch(String watchId) {
+    var existingWatch = priceWatchRepository.findByWatchId(watchId);
+    if (!existingWatch.isPresent()) {
+      return Optional.empty();
+    }
+    PriceWatch watchToDeActivate = existingWatch.get().deActivate();
+    return Optional.of(priceWatchRepository.save(watchToDeActivate));
+  }
+
+  @Override
+  public Optional<PriceWatch> deleteWatch(String watchId) {
     var deletedWatches = priceWatchRepository.deleteByWatchId(watchId);
     if (CollectionUtils.isEmpty(deletedWatches)) {
-      throw new IllegalArgumentException(
-          "Did not find nonexistent watchId=" + watchId + " to delete");
+      return Optional.empty();
     }
     if (deletedWatches.size() > 1) {
-      throw new MongoException(
-          "Unexpectedly found and deleted more than 1 watch for the same watchId! deletedWatches="
-              + deletedWatches);
+      log.error(
+          "Unexpectedly found and deleted more than 1 watch for the same watchId! deletedWatches={}",
+          deletedWatches);
     }
-    return deletedWatches.get(0);
+    return Optional.of(deletedWatches.get(0));
   }
 
   String randomWatchId() {

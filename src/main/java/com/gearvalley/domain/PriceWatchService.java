@@ -11,9 +11,13 @@ public interface PriceWatchService {
 
   List<PriceWatch> fetchAllWatches();
 
-  Optional<PriceWatch> fetchWatchById(String watchId);
-
   List<PriceWatch> fetchWatchesByProviderIdAndUrl(String providerId, String url);
 
-  PriceWatch deleteWatch(String watchId);
+  Optional<PriceWatch> fetchWatchById(String watchId);
+
+  Optional<PriceWatch> activateWatch(String watchId);
+
+  Optional<PriceWatch> deActivateWatch(String watchId);
+
+  Optional<PriceWatch> deleteWatch(String watchId);
 }

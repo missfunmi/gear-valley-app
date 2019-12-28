@@ -14,6 +14,6 @@ public class Gear {
   @NotBlank private String description;
   @NotNull private BigDecimal price;
   private String watchId;
-  private Boolean isWatchActive;
+  private Boolean watchActive;
   private GearImage image;
 }

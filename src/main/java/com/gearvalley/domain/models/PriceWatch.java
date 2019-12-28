@@ -25,6 +25,16 @@ public class PriceWatch {
   private String providerId;
   private PriceDetail currentPrice;
   private List<PriceDetail> priceHistory;
-  private boolean isActive;
+  private boolean active;
   @Exclude private GearImage image;
+
+  public PriceWatch activate() {
+    this.active = true;
+    return this;
+  }
+
+  public PriceWatch deActivate() {
+    this.active = false;
+    return this;
+  }
 }

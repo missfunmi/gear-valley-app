@@ -9,13 +9,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,20 +58,56 @@ public class PriceWatchController {
             })
         .orElseGet(
             () -> {
-              log.info("No matching priceWatch found for watchId={}", watchId);
+              log.warn("No matching priceWatch found for watchId={}", watchId);
               return ResponseEntity.notFound().build();
             });
   }
 
   @DeleteMapping("/{watchId}")
-  public ResponseEntity<PriceWatch> deletePriceWatch(@PathVariable @NotBlank String watchId) {
-    var deletedWatch = priceWatchService.deleteWatch(watchId);
-    log.info("Deleted priceWatch={}", deletedWatch);
-    return ResponseEntity.noContent().build();
+  public ResponseEntity deletePriceWatch(@PathVariable @NotBlank String watchId) {
+    return priceWatchService
+        .deleteWatch(watchId)
+        .map(
+            (priceWatch) -> {
+              log.info("Deleted requested priceWatch={}", priceWatch);
+              return ResponseEntity.noContent().build();
+            })
+        .orElseGet(
+            () -> {
+              log.warn("No matching priceWatch found for watchId={}", watchId);
+              return ResponseEntity.notFound().build();
+            });
   }
 
-  @PostMapping("/{watchId}/disable")
-  public ResponseEntity<PriceWatch> disablePriceWatch(@PathVariable @NotBlank String watchId) {
-    throw new NotImplementedException("disablePriceWatch command is not yet implemented");
+  @PutMapping("/{watchId}/activate")
+  public ResponseEntity<PriceWatch> activatePriceWatch(@PathVariable @NotBlank String watchId) {
+    return priceWatchService
+        .activateWatch(watchId)
+        .map(
+            (priceWatch) -> {
+              log.info("Activated requested priceWatch={}", priceWatch);
+              return ResponseEntity.ok(priceWatch);
+            })
+        .orElseGet(
+            () -> {
+              log.warn("No matching priceWatch found for watchId={}", watchId);
+              return ResponseEntity.notFound().build();
+            });
+  }
+
+  @PutMapping("/{watchId}/deactivate")
+  public ResponseEntity<PriceWatch> deActivatePriceWatch(@PathVariable @NotBlank String watchId) {
+    return priceWatchService
+        .deActivateWatch(watchId)
+        .map(
+            (priceWatch) -> {
+              log.info("Deactivated requested priceWatch={}", priceWatch);
+              return ResponseEntity.ok(priceWatch);
+            })
+        .orElseGet(
+            () -> {
+              log.warn("No matching priceWatch found for watchId={}", watchId);
+              return ResponseEntity.notFound().build();
+            });
   }
 }
