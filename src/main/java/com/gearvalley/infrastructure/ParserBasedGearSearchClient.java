@@ -41,7 +41,7 @@ public abstract class ParserBasedGearSearchClient implements GearSiteSearchClien
                   .description(extractGearDescription(x))
                   .url(url)
                   .watchId(matchingPriceWatch.map(PriceWatch::getWatchId).orElse(null))
-                  .isWatchActive(matchingPriceWatch.map(PriceWatch::isActive).orElse(null))
+                  .watchActive(matchingPriceWatch.map(PriceWatch::isActive).orElse(null))
                   .image(jsoupClient.fetchGearImage(providerId, extractGearImageSrc(x)))
                   .build();
             })
