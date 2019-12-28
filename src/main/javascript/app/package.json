@@ -55,6 +55,19 @@
   },
   "proxy": "http://localhost:8080",
   "devDependencies": {
+    "husky": ">=1",
+    "lint-staged": ">=8",
     "prettier": "1.19.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.+(js|jsx|ts|tsx|json|css|md)": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
