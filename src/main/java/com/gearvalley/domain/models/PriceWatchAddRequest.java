@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class PriceWatchAddRequest {
-  @NotBlank private String keyword;
+  private String keyword;
   @NotBlank private String providerId;
   @NotNull private Gear gear;
 }
