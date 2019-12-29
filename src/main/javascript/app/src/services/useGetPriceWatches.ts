@@ -1,47 +1,22 @@
 import { useEffect, useReducer } from 'react'
 import { FetchStatus } from 'types/enums'
-import { IAction, IPriceWatchResult, IServiceResponse } from 'types'
+import { IPriceWatchResult } from 'types'
+import { fetchReducer, FetchState, FetchReducer } from './fetchReducer'
 
-const initialState: IServiceResponse<IPriceWatchResult> = {
+const initialState: FetchState<IPriceWatchResult> = {
   status: FetchStatus.Loaded,
   error: undefined,
   data: undefined,
 }
 
-const reducer = (
-  state: IServiceResponse<IPriceWatchResult>,
-  action: IAction<IPriceWatchResult>
-) => {
-  switch (action.type) {
-    case 'REQUEST':
-      return {
-        ...state,
-        status: FetchStatus.Loading,
-        error: undefined,
-      }
-    case 'SUCCESS':
-      return {
-        ...state,
-        status: FetchStatus.Loaded,
-        data: action.payload,
-      }
-    case 'FAILURE':
-      return {
-        ...state,
-        status: FetchStatus.Error,
-        error: action.error,
-      }
-    default:
-      return state
-  }
-}
-
 const useGetPriceWatches = () => {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const searchReducer: FetchReducer<IPriceWatchResult> = fetchReducer
+  const [state, dispatch] = useReducer(searchReducer, initialState)
 
   useEffect(() => {
     ;(async () => {
       try {
+        dispatch({ type: 'REQUEST' })
         const res = await fetch('api/v1/priceWatches', {
           method: 'GET',
           headers: {

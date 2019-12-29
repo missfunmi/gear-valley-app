@@ -23,7 +23,6 @@ export interface ISearchResultWrapper {
   results: Array<ISearchResult>
 }
 export interface IAddWatchRequest {
-  keyword: string
   providerId: string
   gear: IGear
 }
@@ -38,21 +37,15 @@ export interface IPriceWatch {
   providerId: string
   url: string
   lastPriceCheck: Date
-  currentPrice: number
-  startingPrice: number
-  image: string | null
+  currentPrice: ISpotPrice
+  priceHistory: Array<ISpotPrice>
+  image: IImage
   active: boolean
 }
 export interface IPriceWatchResult {
   data: Array<IPriceWatch>
 }
-export interface IServiceResponse<T> {
-  data?: T
-  error?: string | Error
-  status: FetchStatus
-}
-interface IAction<T> {
-  type: 'SUCCESS' | 'REQUEST' | 'FAILURE'
-  error?: string | Error
-  payload?: T
+export interface ISpotPrice {
+  price: number
+  dateOfCheck: Date
 }

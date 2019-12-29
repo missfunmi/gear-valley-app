@@ -5,19 +5,13 @@ import { GearCard } from 'components/GearCard'
 
 interface ISearchResultProps {
   result: ISearchResult | null
-  onAddPriceWatch: (result: ISearchResult, gear: IGear) => Promise<void>
 }
 
 // tslint:disable:jsx-no-lambda
-export const SearchResult: React.FC<ISearchResultProps> = ({ result, onAddPriceWatch }) => {
-  const handleAddPriceWatch = (gear: IGear) => {
-    return () => {
-      onAddPriceWatch(result!, gear)
-    }
-  }
+export const SearchResult: React.FC<ISearchResultProps> = ({ result }) => {
   const renderItem = (gear?: IGear): JSX.Element => (
     <div style={{ marginBottom: 12 }}>
-      <GearCard gear={gear!} onToggleWatch={handleAddPriceWatch(gear!)} />
+      <GearCard gear={gear!} providerId={result?.providerId!} />
     </div>
   )
   return (
