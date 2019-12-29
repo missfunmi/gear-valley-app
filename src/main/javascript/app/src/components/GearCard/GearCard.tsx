@@ -1,20 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ActionButton, IButtonStyles } from 'office-ui-fabric-react/lib/Button'
 import { Icon, IIconStyles } from 'office-ui-fabric-react/lib/Icon'
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner'
 import { Stack } from 'office-ui-fabric-react/lib/Stack'
 import { Text, ITextStyles } from 'office-ui-fabric-react/lib/Text'
 import { Card, ICardTokens, ICardSectionStyles, ICardSectionTokens } from '@uifabric/react-cards'
 import { FontWeights } from '@uifabric/styling'
-import { IGear } from 'types'
+import { useAddPriceWatchService } from 'services'
+import { IGear, IAddWatchRequest } from 'types'
 import { GearCardImage } from './GearCardImage'
+import { FetchStatus } from 'types/enums'
 
 interface IGearCardProps {
   gear: IGear
-  onToggleWatch: () => void
+  providerId: string
 }
 
 // tslint:disable:jsx-no-lambda
-export const GearCard: React.FC<IGearCardProps> = ({ gear, onToggleWatch }) => {
+export const GearCard: React.FC<IGearCardProps> = ({ gear, providerId }) => {
+  const [addWatchRequest, setAddWatchRequest] = useState<IAddWatchRequest | undefined>()
+  const useAddPriceWatchResponse = useAddPriceWatchService(addWatchRequest)
+
   const siteTextStyles: ITextStyles = {
     root: {
       color: '#025F52',
@@ -59,6 +65,16 @@ export const GearCard: React.FC<IGearCardProps> = ({ gear, onToggleWatch }) => {
     padding: '0px 0px 0px 12px',
   }
 
+  const handleAddWatchClick = () => {
+    const addWatchRequest: IAddWatchRequest = {
+      providerId: providerId,
+      gear: gear,
+    }
+    setAddWatchRequest(addWatchRequest)
+  }
+
+  const toggleWatchIcon = 'SingleBookmark'
+
   return (
     <Card aria-label="Clickable horizontal card " horizontal tokens={cardTokens}>
       <Card.Item>
@@ -74,14 +90,17 @@ export const GearCard: React.FC<IGearCardProps> = ({ gear, onToggleWatch }) => {
         </Text>
       </Card.Section>
       <Card.Section styles={footerCardSectionStyles} tokens={footerCardSectionTokens}>
-        {/*<Icon iconName="RedEye" styles={iconStyles} />*/}
-        <ActionButton
-          iconProps={{ iconName: 'SingleBookmark', styles: iconStyles }}
-          title="Add Watch"
-          checked={false}
-          onClick={onToggleWatch}
-          styles={actionButtonStyles}
-        />
+        {useAddPriceWatchResponse.status === FetchStatus.Loading ? (
+          <Spinner size={SpinnerSize.small} />
+        ) : (
+          <ActionButton
+            iconProps={{ iconName: toggleWatchIcon, styles: iconStyles }}
+            title="Add Watch"
+            checked={false}
+            onClick={handleAddWatchClick}
+            styles={actionButtonStyles}
+          />
+        )}
         <Stack.Item grow={1}>
           <span />
         </Stack.Item>

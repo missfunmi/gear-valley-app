@@ -5,7 +5,7 @@ import { SearchBox, ISearchBoxStyles } from 'office-ui-fabric-react/lib/SearchBo
 import { Spinner } from 'office-ui-fabric-react/lib/Spinner'
 import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack'
 import { FetchStatus } from 'types/enums'
-import { IAddWatchRequest, IGear, ISearchResult } from 'types'
+import { ISearchResult } from 'types'
 import { SearchResult } from 'components/Search'
 import { useSearchService } from 'services'
 
@@ -25,31 +25,6 @@ const SearchPage: React.FC = () => {
   const [keyword, setKeyword] = useState<string>('')
   const searchResponse = useSearchService(keyword)
   const [showError, setShowError] = useState<boolean>(true)
-  const handleAddWatch = async (result: ISearchResult, gear: IGear) => {
-    try {
-      const addWatchRequest: IAddWatchRequest = {
-        keyword: keyword,
-        providerId: result.providerId,
-        gear: gear,
-      }
-      const res = await fetch('api/v1/priceWatches', {
-        method: 'POST',
-        body: JSON.stringify(addWatchRequest),
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      })
-      const json = await res.json()
-      if (!res.ok) {
-        console.error(json)
-        throw new Error('Error adding price watch')
-      }
-    } catch (err) {
-      console.error(err)
-      alert('Error adding price watch')
-    }
-  }
 
   const handleErrorDismiss = () => {
     setShowError(false)
@@ -70,7 +45,7 @@ const SearchPage: React.FC = () => {
         key={result.providerId}
       >
         <div style={{ marginTop: 12 }}>
-          <SearchResult result={result} onAddPriceWatch={handleAddWatch} />
+          <SearchResult result={result} />
         </div>
       </PivotItem>
     )

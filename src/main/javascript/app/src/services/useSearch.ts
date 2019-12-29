@@ -1,24 +1,25 @@
 import { useEffect, useReducer } from 'react'
 import { FetchStatus } from 'types/enums'
-import { IPriceWatchResult } from 'types'
+import { ISearchResultWrapper } from 'types'
 import { fetchReducer, FetchState, FetchReducer } from './fetchReducer'
 
-const initialState: FetchState<IPriceWatchResult> = {
+const initialState: FetchState<ISearchResultWrapper> = {
   status: FetchStatus.Loaded,
-  error: undefined,
-  data: undefined,
 }
 
-const useGetPriceWatches = () => {
-  const searchReducer: FetchReducer<IPriceWatchResult> = fetchReducer
+const useSearch = (keyword: string) => {
+  const searchReducer: FetchReducer<ISearchResultWrapper> = fetchReducer
   const [state, dispatch] = useReducer(searchReducer, initialState)
 
   useEffect(() => {
+    if (!keyword) return
     ;(async () => {
       try {
         dispatch({ type: 'REQUEST' })
-        const res = await fetch('api/v1/priceWatches', {
-          method: 'GET',
+        const request = { keyword }
+        const res = await fetch('api/v1/search', {
+          method: 'POST',
+          body: JSON.stringify(request),
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -33,9 +34,9 @@ const useGetPriceWatches = () => {
         dispatch({ type: 'FAILURE', error: err })
       }
     })()
-  }, [])
+  }, [keyword])
 
   return state
 }
 
-export default useGetPriceWatches
+export default useSearch
