@@ -1,7 +1,15 @@
 import React, { useState } from 'react'
 import { useGetPriceWatchesService } from 'services'
 import { FetchStatus } from 'types/enums'
-import { Spinner, MessageBar, MessageBarType, Stack, IStackTokens } from 'office-ui-fabric-react'
+import {
+  Spinner,
+  MessageBar,
+  MessageBarType,
+  Stack,
+  IStackTokens,
+  Pivot,
+  PivotItem,
+} from 'office-ui-fabric-react'
 import { WatchList } from './WatchList'
 
 const stackTokens: IStackTokens = {
@@ -41,7 +49,20 @@ const WatchesPage: React.FC = () => {
         <Spinner label="Loading your price watches..." ariaLive="assertive" labelPosition="top" />
       )}
       {getPriceWatchesResponse.status === FetchStatus.Loaded && getPriceWatchesResponse.data && (
-        <WatchList priceWatches={getPriceWatchesResponse.data.data} />
+        <Pivot aria-label="Price Watches">
+          <PivotItem headerText="Active Watches">
+            <div style={{ marginTop: 12 }}>
+              <WatchList priceWatches={getPriceWatchesResponse.data.data.filter(pw => pw.active)} />
+            </div>
+          </PivotItem>
+          <PivotItem headerText="Past Watches">
+            <div style={{ marginTop: 12 }}>
+              <WatchList
+                priceWatches={getPriceWatchesResponse.data.data.filter(pw => !pw.active)}
+              />
+            </div>
+          </PivotItem>
+        </Pivot>
       )}
     </Stack>
   )

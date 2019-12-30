@@ -5,20 +5,21 @@ import { WatchCard } from 'components/WatchCard'
 
 interface IWatchListProps {
   priceWatches: Array<IPriceWatch>
+  noDataLabel?: string
 }
 
 // tslint:disable:jsx-no-lambda
-export const WatchList: React.FC<IWatchListProps> = ({ priceWatches }) => {
+export const WatchList: React.FC<IWatchListProps> = ({ priceWatches, noDataLabel }) => {
   const renderItem = (watch?: IPriceWatch): JSX.Element => (
     <div style={{ marginBottom: 12 }}>
       <WatchCard priceWatch={watch!} />
     </div>
   )
-  return (
-    priceWatches && (
-      <div>
-        <List items={priceWatches} onRenderCell={renderItem} />
-      </div>
-    )
+  return priceWatches.length === 0 ? (
+    <div>{noDataLabel || 'No Data'}</div>
+  ) : (
+    <div>
+      <List items={priceWatches} onRenderCell={renderItem} />
+    </div>
   )
 }
