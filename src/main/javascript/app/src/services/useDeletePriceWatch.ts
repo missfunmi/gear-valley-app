@@ -7,39 +7,35 @@ const initialState: FetchState<ISearchResultWrapper> = {
   status: FetchStatus.Empty,
 }
 
-const useSearch = (keyword: string) => {
+const useDeletePriceWatch = (watchId: string | undefined) => {
   const reducer: FetchReducer<ISearchResultWrapper> = fetchReducer
   const [state, dispatch] = useReducer(reducer, initialState)
 
   useEffect(() => {
     ;(async () => {
       try {
-        if (!keyword) {
+        if (!watchId) {
           dispatch({ type: 'CLEAR' })
           return
         }
         dispatch({ type: 'REQUEST' })
-        const request = { keyword }
-        const res = await fetch('api/v1/search', {
-          method: 'POST',
-          body: JSON.stringify(request),
+        const res = await fetch(`api/v1/priceWatches/${watchId}`, {
+          method: 'DELETE',
           headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json',
           },
         })
-        const json = await res.json()
         if (!res.ok) {
-          throw new Error('Error fetching results')
+          throw new Error('Error deleting price watch')
         }
-        dispatch({ type: 'SUCCESS', payload: json })
+        dispatch({ type: 'SUCCESS' })
       } catch (err) {
         dispatch({ type: 'FAILURE', error: err })
       }
     })()
-  }, [keyword])
+  }, [watchId])
 
   return state
 }
 
-export default useSearch
+export default useDeletePriceWatch

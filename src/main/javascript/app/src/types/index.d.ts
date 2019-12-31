@@ -10,6 +10,8 @@ export interface IGear {
   description: string
   url: string
   image: IImage
+  watchActive: boolean
+  watchId?: string
 }
 export interface ISearchResult {
   providerId: string

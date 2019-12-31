@@ -10,9 +10,14 @@ export type FetchAction<T> =
   | { type: 'REQUEST' }
   | { type: 'SUCCESS'; payload?: T }
   | { type: 'FAILURE'; error: string }
+  | { type: 'CLEAR' }
 
 export function fetchReducer<T>(state: FetchState<T>, action: FetchAction<T>) {
   switch (action.type) {
+    case 'CLEAR':
+      return {
+        status: FetchStatus.Empty,
+      }
     case 'REQUEST':
       return {
         status: FetchStatus.Loading,
