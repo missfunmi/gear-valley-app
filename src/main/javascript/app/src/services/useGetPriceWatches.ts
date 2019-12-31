@@ -4,14 +4,12 @@ import { IPriceWatchResult } from 'types'
 import { fetchReducer, FetchState, FetchReducer } from './fetchReducer'
 
 const initialState: FetchState<IPriceWatchResult> = {
-  status: FetchStatus.Loaded,
-  error: undefined,
-  data: undefined,
+  status: FetchStatus.Empty,
 }
 
 const useGetPriceWatches = () => {
-  const searchReducer: FetchReducer<IPriceWatchResult> = fetchReducer
-  const [state, dispatch] = useReducer(searchReducer, initialState)
+  const reducer: FetchReducer<IPriceWatchResult> = fetchReducer
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   useEffect(() => {
     ;(async () => {
@@ -21,7 +19,6 @@ const useGetPriceWatches = () => {
           method: 'GET',
           headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json',
           },
         })
         const json = await res.json()

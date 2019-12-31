@@ -6,7 +6,7 @@ import { Stack } from 'office-ui-fabric-react/lib/Stack'
 import { Text, ITextStyles } from 'office-ui-fabric-react/lib/Text'
 import { Card, ICardTokens, ICardSectionStyles, ICardSectionTokens } from '@uifabric/react-cards'
 import { FontWeights } from '@uifabric/styling'
-import { useAddPriceWatchService } from 'services'
+import { useAddPriceWatchService, useDeletePriceWatchService } from 'services'
 import { IGear, IAddWatchRequest } from 'types'
 import { GearCardImage } from './GearCardImage'
 import { FetchStatus } from 'types/enums'
@@ -16,64 +16,77 @@ interface IGearCardProps {
   providerId: string
 }
 
+const siteTextStyles: ITextStyles = {
+  root: {
+    color: '#025F52',
+    fontWeight: FontWeights.semibold,
+  },
+}
+const descriptionTextStyles: ITextStyles = {
+  root: {
+    color: '#333333',
+    fontWeight: FontWeights.regular,
+  },
+}
+const helpfulTextStyles: ITextStyles = {
+  root: {
+    color: '#333333',
+    fontWeight: FontWeights.regular,
+  },
+}
+const iconStyles: IIconStyles = {
+  root: {
+    color: '#0078D4',
+    fontSize: 16,
+    fontWeight: FontWeights.regular,
+    margin: 0,
+  },
+}
+const footerCardSectionStyles: ICardSectionStyles = {
+  root: {
+    alignSelf: 'stretch',
+    borderLeft: '1px solid #F3F2F1',
+  },
+}
+const actionButtonStyles: IButtonStyles = {
+  root: {
+    margin: 0,
+    padding: 0,
+  },
+}
+const cardTokens: ICardTokens = {
+  childrenMargin: 12,
+}
+const footerCardSectionTokens: ICardSectionTokens = {
+  padding: '0px 0px 0px 12px',
+}
+
 // tslint:disable:jsx-no-lambda
 export const GearCard: React.FC<IGearCardProps> = ({ gear, providerId }) => {
   const [addWatchRequest, setAddWatchRequest] = useState<IAddWatchRequest | undefined>()
+  const [currentlyWatching, setCurrentlyWatching] = useState<boolean>(gear.watchId !== undefined)
   const useAddPriceWatchResponse = useAddPriceWatchService(addWatchRequest)
+  const [deleteWatchRequest, setDeleteWatchRequest] = useState<string | undefined>()
+  const useDeletePriceWatchResponse = useDeletePriceWatchService(deleteWatchRequest)
+  // const isActiveWatch = (gear.watchActive || useAddPriceWatchResponse.status === FetchStatus.Loaded)
 
-  const siteTextStyles: ITextStyles = {
-    root: {
-      color: '#025F52',
-      fontWeight: FontWeights.semibold,
-    },
-  }
-  const descriptionTextStyles: ITextStyles = {
-    root: {
-      color: '#333333',
-      fontWeight: FontWeights.regular,
-    },
-  }
-  const helpfulTextStyles: ITextStyles = {
-    root: {
-      color: '#333333',
-      fontWeight: FontWeights.regular,
-    },
-  }
-  const iconStyles: IIconStyles = {
-    root: {
-      color: '#0078D4',
-      fontSize: 16,
-      fontWeight: FontWeights.regular,
-      margin: 0,
-    },
-  }
-  const footerCardSectionStyles: ICardSectionStyles = {
-    root: {
-      alignSelf: 'stretch',
-      borderLeft: '1px solid #F3F2F1',
-    },
-  }
-  const actionButtonStyles: IButtonStyles = {
-    root: {
-      margin: 0,
-      padding: 0,
-    },
-  }
-
-  const cardTokens: ICardTokens = { childrenMargin: 12 }
-  const footerCardSectionTokens: ICardSectionTokens = {
-    padding: '0px 0px 0px 12px',
-  }
-
-  const handleAddWatchClick = () => {
-    const addWatchRequest: IAddWatchRequest = {
-      providerId: providerId,
-      gear: gear,
+  const handleToggleWatchClick = () => {
+    if (currentlyWatching) {
+      setAddWatchRequest(undefined)
+      setDeleteWatchRequest(useAddPriceWatchResponse?.data?.watchId || gear.watchId)
+      setCurrentlyWatching(false)
+    } else {
+      const addWatchRequest: IAddWatchRequest = {
+        providerId: providerId,
+        gear: gear,
+      }
+      setDeleteWatchRequest(undefined)
+      setAddWatchRequest(addWatchRequest)
+      setCurrentlyWatching(true)
     }
-    setAddWatchRequest(addWatchRequest)
   }
 
-  const toggleWatchIcon = 'SingleBookmark'
+  const toggleWatchIcon = currentlyWatching ? 'SingleBookmarkSolid' : 'SingleBookmark'
 
   return (
     <Card aria-label="Clickable horizontal card " horizontal tokens={cardTokens}>
@@ -95,9 +108,8 @@ export const GearCard: React.FC<IGearCardProps> = ({ gear, providerId }) => {
         ) : (
           <ActionButton
             iconProps={{ iconName: toggleWatchIcon, styles: iconStyles }}
-            title="Add Watch"
-            checked={false}
-            onClick={handleAddWatchClick}
+            title={currentlyWatching ? 'Remove Watch' : 'Add Watch'}
+            onClick={handleToggleWatchClick}
             styles={actionButtonStyles}
           />
         )}
