@@ -24,6 +24,9 @@ public class MockJsoupClient implements JsoupClient {
   Map<String, String> providerIdToMockSearchResultsFilePath =
       ImmutableMap.of("REI", "mocks/rei-search-results.html");
 
+  Map<String, String> providerIdToMockPriceCheckFilePath =
+      ImmutableMap.of("REI", "mocks/rei-price-check-outlet.html");
+
   Map<String, String> providerIdToMockSearchResultsImageFilePath =
       ImmutableMap.of("REI", "mocks/rei-search-results-image.jpeg");
 
@@ -45,6 +48,22 @@ public class MockJsoupClient implements JsoupClient {
       return Jsoup.parse(html, String.format(providerIdToSiteUrlBase.get(providerId), keyword));
     } catch (IOException e) {
       throw new RuntimeException("Something bad happened while Jsoup-parsing the mock results file", e);
+    }
+  }
+
+  @Override
+  public Document fetchHTMLDocument(String url) {
+
+    try {
+      // TODO Clean this up
+      URL resourcePath =
+          Resources.getResource(providerIdToMockPriceCheckFilePath.get("REI"));
+      String html = Resources.toString(resourcePath, StandardCharsets.UTF_8);
+      log.info("Successfully fetched html from resourcePath={}", resourcePath);
+      return Jsoup.parse(html, url);
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "Something bad happened while Jsoup-parsing the mock results file", e);
     }
   }
 

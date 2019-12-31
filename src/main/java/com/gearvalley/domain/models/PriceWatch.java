@@ -33,7 +33,7 @@ public class PriceWatch {
     return this;
   }
 
-  public PriceWatch deActivate() {
+  public PriceWatch deactivate() {
     this.active = false;
     return this;
   }
