@@ -14,7 +14,7 @@ public class ProfileManager {
 
   @Autowired private Environment environment;
 
-  @Value("${application.expected.active.profile}")
+  @Value("${application.profiles.active}")
   private String expectedActiveProfile;
 
   @PostConstruct

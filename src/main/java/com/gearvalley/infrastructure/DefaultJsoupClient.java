@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Profile("prod")
 public class DefaultJsoupClient implements JsoupClient {
 
+  // TODO Get rid of this method
   @Override
   public Document fetchHTMLDocument(String providerId, String keyword) {
     Preconditions.checkArgument(
@@ -31,6 +32,11 @@ public class DefaultJsoupClient implements JsoupClient {
     // TODO "/search?q=" is REI-specific -- should generify this implementation
     String url = providerIdToSiteUrlBase.get(providerId) + "/search?q=" + keyword + "&pagesize=90";
 
+    return fetchHTMLDocument(url);
+  }
+
+  @Override
+  public Document fetchHTMLDocument(String url) {
     try {
       return Jsoup.connect(url)
           .timeout(30000)
@@ -53,15 +59,17 @@ public class DefaultJsoupClient implements JsoupClient {
     Preconditions.checkArgument(
         StringUtils.isNotEmpty(relativePath), "Invalid attempt to search with empty relativePath!");
 
-    // TODO "relativePath" implementation may be REI-specific, other sites might have embedded images or svg, etc.
+    // TODO "relativePath" implementation may be REI-specific, other sites might have embedded
+    // images or svg, etc.
     String url = providerIdToSiteUrlBase.get(providerId) + "/" + relativePath;
 
     try {
-      Response resultImageResponse = Jsoup.connect(url)
-          .timeout(30000)
-          .userAgent("Mozilla/5.0")
-          .ignoreContentType(true)
-          .execute();
+      Response resultImageResponse =
+          Jsoup.connect(url)
+              .timeout(30000)
+              .userAgent("Mozilla/5.0")
+              .ignoreContentType(true)
+              .execute();
       String base64Image = Base64.getEncoder().encodeToString(resultImageResponse.bodyAsBytes());
       String contentType = resultImageResponse.contentType();
       return GearImage.builder().base64Image(base64Image).contentType(contentType).build();

@@ -61,11 +61,15 @@ public class MongoConfig {
     IndexOperations indexOperations = mongoTemplate().indexOps(PriceWatch.class);
     indexOperations.ensureIndex(new Index("watchId", Direction.ASC).unique());
     indexOperations.ensureIndex(new Index("url", Direction.ASC));
+    indexOperations.ensureIndex(new Index("active", Direction.ASC));
     log.debug(
         "Collection=PriceWatch in database={} has indices={}",
         database,
         indexOperations.getIndexInfo());
 
-    log.info("Completed index resolution in {}ms", (System.currentTimeMillis() - start));
+    log.info(
+        "Completed index resolution of {} indices in {}ms",
+        indexOperations.getIndexInfo().size(),
+        (System.currentTimeMillis() - start));
   }
 }

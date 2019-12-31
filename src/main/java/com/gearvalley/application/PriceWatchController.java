@@ -79,6 +79,7 @@ public class PriceWatchController {
             });
   }
 
+  // TODO -- Move below to a different controller?
   @PutMapping("/{watchId}/activate")
   public ResponseEntity<PriceWatch> activatePriceWatch(@PathVariable @NotBlank String watchId) {
     return priceWatchService
@@ -96,9 +97,9 @@ public class PriceWatchController {
   }
 
   @PutMapping("/{watchId}/deactivate")
-  public ResponseEntity<PriceWatch> deActivatePriceWatch(@PathVariable @NotBlank String watchId) {
+  public ResponseEntity<PriceWatch> deactivatePriceWatch(@PathVariable @NotBlank String watchId) {
     return priceWatchService
-        .deActivateWatch(watchId)
+        .deactivateWatch(watchId)
         .map(
             (priceWatch) -> {
               log.info("Deactivated requested priceWatch={}", priceWatch);
