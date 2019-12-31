@@ -59,6 +59,11 @@ public class DefaultPriceWatchService implements PriceWatchService {
   }
 
   @Override
+  public List<PriceWatch> fetchAllActiveWatches() {
+    return priceWatchRepository.findAllActive();
+  }
+
+  @Override
   public List<PriceWatch> fetchWatchesByProviderIdAndUrl(String providerId, String url) {
     return priceWatchRepository.findByProviderIdAndUrl(providerId, url);
   }

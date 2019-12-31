@@ -11,6 +11,8 @@ public interface PriceWatchService {
 
   List<PriceWatch> fetchAllWatches();
 
+  List<PriceWatch> fetchAllActiveWatches();
+
   List<PriceWatch> fetchWatchesByProviderIdAndUrl(String providerId, String url);
 
   Optional<PriceWatch> fetchWatchById(String watchId);

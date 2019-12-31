@@ -79,6 +79,7 @@ public class PriceWatchController {
             });
   }
 
+  // TODO -- Move below to a different controller?
   @PutMapping("/{watchId}/activate")
   public ResponseEntity<PriceWatch> activatePriceWatch(@PathVariable @NotBlank String watchId) {
     return priceWatchService
