@@ -4,9 +4,15 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.server.ErrorPage;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
@@ -18,6 +24,16 @@ public class GearValleyApplication {
 
   @Configuration
   public class WebConfig implements WebMvcConfigurer {
+    public static final String NOT_FOUND_PATH = "/notFound";
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+      registry.addViewController(NOT_FOUND_PATH).setStatusCode(HttpStatus.OK).setViewName("forward:/index.html");
+    }
+
+    @Bean
+    public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> containerCustomizer() {
+      return container -> container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, NOT_FOUND_PATH));
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
