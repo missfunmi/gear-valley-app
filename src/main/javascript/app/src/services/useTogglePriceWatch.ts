@@ -1,13 +1,14 @@
 import { useEffect, useReducer } from 'react'
 import { FetchStatus } from 'types/enums'
+import { IPriceWatch } from 'types'
 import { fetchReducer, FetchState, FetchReducer } from './fetchReducer'
 
-const initialState: FetchState<undefined> = {
+const initialState: FetchState<IPriceWatch> = {
   status: FetchStatus.Empty,
 }
 
-const useDeletePriceWatch = (watchId: string | undefined) => {
-  const reducer: FetchReducer<undefined> = fetchReducer
+const useTogglePriceWatch = (watchId: string | undefined, active?: boolean) => {
+  const reducer: FetchReducer<IPriceWatch> = fetchReducer
   const [state, dispatch] = useReducer(reducer, initialState)
 
   useEffect(() => {
@@ -18,12 +19,15 @@ const useDeletePriceWatch = (watchId: string | undefined) => {
           return
         }
         dispatch({ type: 'REQUEST' })
-        const res = await fetch(`api/v1/priceWatches/${watchId}`, {
-          method: 'DELETE',
-          headers: {
-            Accept: 'application/json',
-          },
-        })
+        const res = await fetch(
+          `api/v1/priceWatches/${watchId}/${active ? 'activate' : 'deactivate'}`,
+          {
+            method: 'PUT',
+            headers: {
+              Accept: 'application/json',
+            },
+          }
+        )
         if (!res.ok) {
           throw new Error('Error deleting price watch')
         }
@@ -32,9 +36,9 @@ const useDeletePriceWatch = (watchId: string | undefined) => {
         dispatch({ type: 'FAILURE', error: err })
       }
     })()
-  }, [watchId])
+  }, [watchId, active])
 
   return state
 }
 
-export default useDeletePriceWatch
+export default useTogglePriceWatch
