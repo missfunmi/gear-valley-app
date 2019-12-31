@@ -64,7 +64,7 @@ const WatchesPage: React.FC = () => {
           />
           <WatchList
             priceWatches={getPriceWatchesResponse.data.data.filter(
-              pw => (showInactiveWatches && pw.active) || !showInactiveWatches
+              pw => (showInactiveWatches && pw.active) || showInactiveWatches
             )}
           />
         </>
