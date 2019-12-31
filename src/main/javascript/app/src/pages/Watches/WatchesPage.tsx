@@ -7,8 +7,7 @@ import {
   MessageBarType,
   Stack,
   IStackTokens,
-  Pivot,
-  PivotItem,
+  Toggle,
 } from 'office-ui-fabric-react'
 import { WatchList } from './WatchList'
 
@@ -20,10 +19,15 @@ const stackTokens: IStackTokens = {
 // tslint:disable:jsx-no-lambda
 const WatchesPage: React.FC = () => {
   const [showError, setShowError] = useState<boolean>(true)
+  const [showInactiveWatches, setShowInactiveWatches] = useState<boolean>(false)
   const getPriceWatchesResponse = useGetPriceWatchesService()
 
   const handleErrorDismiss = () => {
     setShowError(false)
+  }
+
+  const handleShowActiveWatchToggle = () => {
+    setShowInactiveWatches(!showInactiveWatches)
   }
 
   const renderError = (error: any) => {
@@ -49,20 +53,21 @@ const WatchesPage: React.FC = () => {
         <Spinner label="Loading your price watches..." ariaLive="assertive" labelPosition="top" />
       )}
       {getPriceWatchesResponse.status === FetchStatus.Loaded && getPriceWatchesResponse.data && (
-        <Pivot aria-label="Price Watches">
-          <PivotItem headerText="Active Watches">
-            <div style={{ marginTop: 12 }}>
-              <WatchList priceWatches={getPriceWatchesResponse.data.data.filter(pw => pw.active)} />
-            </div>
-          </PivotItem>
-          <PivotItem headerText="Past Watches">
-            <div style={{ marginTop: 12 }}>
-              <WatchList
-                priceWatches={getPriceWatchesResponse.data.data.filter(pw => !pw.active)}
-              />
-            </div>
-          </PivotItem>
-        </Pivot>
+        <>
+          <Toggle
+            label="Show Inactive Watches"
+            inlineLabel
+            onText="On"
+            offText="Off"
+            onChange={handleShowActiveWatchToggle}
+            checked={showInactiveWatches}
+          />
+          <WatchList
+            priceWatches={getPriceWatchesResponse.data.data.filter(
+              pw => (showInactiveWatches && pw.active) || !showInactiveWatches
+            )}
+          />
+        </>
       )}
     </Stack>
   )

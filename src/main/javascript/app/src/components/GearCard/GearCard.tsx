@@ -68,7 +68,6 @@ export const GearCard: React.FC<IGearCardProps> = ({ gear, providerId }) => {
   const useAddPriceWatchResponse = useAddPriceWatchService(addWatchRequest)
   const [deleteWatchRequest, setDeleteWatchRequest] = useState<string | undefined>()
   const useDeletePriceWatchResponse = useDeletePriceWatchService(deleteWatchRequest)
-  // const isActiveWatch = (gear.watchActive || useAddPriceWatchResponse.status === FetchStatus.Loaded)
 
   const handleToggleWatchClick = () => {
     if (currentlyWatching) {
