@@ -1,20 +1,23 @@
 import { useEffect, useReducer } from 'react'
 import { FetchStatus } from 'types/enums'
-import { ISearchResultWrapper, IAddWatchRequest } from 'types'
+import { IPriceWatch, IAddWatchRequest } from 'types'
 import { fetchReducer, FetchState, FetchReducer } from './fetchReducer'
 
-const initialState: FetchState<ISearchResultWrapper> = {
-  status: FetchStatus.Loaded,
+const initialState: FetchState<IPriceWatch> = {
+  status: FetchStatus.Empty,
 }
 
 const useAddPriceWatch = (addWatchRequest: IAddWatchRequest | undefined) => {
-  const searchReducer: FetchReducer<ISearchResultWrapper> = fetchReducer
-  const [state, dispatch] = useReducer(searchReducer, initialState)
+  const reducer: FetchReducer<IPriceWatch> = fetchReducer
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   useEffect(() => {
-    if (!addWatchRequest) return
     ;(async () => {
       try {
+        if (!addWatchRequest) {
+          dispatch({ type: 'CLEAR' })
+          return
+        }
         dispatch({ type: 'REQUEST' })
         const res = await fetch('api/v1/priceWatches', {
           method: 'POST',
@@ -24,12 +27,11 @@ const useAddPriceWatch = (addWatchRequest: IAddWatchRequest | undefined) => {
             'Content-Type': 'application/json',
           },
         })
-        const json = await res.json()
         if (!res.ok) {
-          console.error(json)
           throw new Error('Error adding price watch')
         }
-        dispatch({ type: 'SUCCESS' })
+        const data = await res.json()
+        dispatch({ type: 'SUCCESS', payload: data })
       } catch (err) {
         dispatch({ type: 'FAILURE', error: err })
       }
