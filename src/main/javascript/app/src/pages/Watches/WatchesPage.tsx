@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
-import { useGetPriceWatchesService } from 'services'
+import {
+  useGetPriceWatchesService,
+  useDeletePriceWatchService,
+  useTogglePriceWatchService,
+} from 'services'
 import { FetchStatus } from 'types/enums'
 import {
   Spinner,
@@ -10,6 +14,7 @@ import {
   Toggle,
 } from 'office-ui-fabric-react'
 import { WatchList } from './WatchList'
+import { ITogglePriceWatchActiveRequest, IPriceWatch } from 'types'
 
 const stackTokens: IStackTokens = {
   childrenGap: 5,
@@ -19,8 +24,21 @@ const stackTokens: IStackTokens = {
 // tslint:disable:jsx-no-lambda
 const WatchesPage: React.FC = () => {
   const [showError, setShowError] = useState<boolean>(true)
-  const [showInactiveWatches, setShowInactiveWatches] = useState<boolean>(false)
+  const [showInactiveWatches, setShowInactiveWatches] = useState<boolean>(true)
   const getPriceWatchesResponse = useGetPriceWatchesService()
+  const [watches, setWatches] = useState<Array<IPriceWatch> | undefined>()
+
+  const [toggleRequest, setToggleRequest] = React.useState<
+    ITogglePriceWatchActiveRequest | undefined
+  >()
+  const [watchIdToDelete, setWatchIdToDelete] = React.useState<string | undefined>()
+  const useDeletePriceWatchResponse = useDeletePriceWatchService(watchIdToDelete)
+  const useTogglePriceWatchResponse = useTogglePriceWatchService(
+    toggleRequest?.watchId,
+    toggleRequest?.active
+  )
+
+  let watchesSnapshot = watches || getPriceWatchesResponse?.data?.data || []
 
   const handleErrorDismiss = () => {
     setShowError(false)
@@ -28,6 +46,25 @@ const WatchesPage: React.FC = () => {
 
   const handleShowActiveWatchToggle = () => {
     setShowInactiveWatches(!showInactiveWatches)
+  }
+
+  const handleDeleteWatch = async (watchId: string) => {
+    setWatchIdToDelete(watchId)
+    // remove deleted watch from watches in state
+    const updatedWatches = watchesSnapshot.filter(w => w.watchId !== watchId) || []
+    setWatches(updatedWatches)
+  }
+
+  const handleToggleActive = async (toggleRequest: ITogglePriceWatchActiveRequest) => {
+    setToggleRequest(toggleRequest)
+    const updatedWatches =
+      watchesSnapshot.map(w => {
+        if (w.watchId === toggleRequest.watchId) {
+          return { ...w, active: toggleRequest.active }
+        }
+        return w
+      }) || []
+    setWatches(updatedWatches)
   }
 
   const renderError = (error: any) => {
@@ -43,6 +80,10 @@ const WatchesPage: React.FC = () => {
     )
   }
 
+  let toggleLabel = 'Show Inactive Watches'
+  let noDataLabel = showInactiveWatches
+    ? 'You have not created any watches'
+    : `No Active Watches. Toggle the "${toggleLabel}" button above to show inactive watches`
   return (
     <Stack tokens={stackTokens}>
       <h4>Price Watches</h4>
@@ -63,9 +104,10 @@ const WatchesPage: React.FC = () => {
             checked={showInactiveWatches}
           />
           <WatchList
-            priceWatches={getPriceWatchesResponse.data.data.filter(
-              pw => (showInactiveWatches && pw.active) || showInactiveWatches
-            )}
+            priceWatches={watchesSnapshot.filter(pw => pw.active || showInactiveWatches)}
+            onDeleteWatch={handleDeleteWatch}
+            onToggleActive={handleToggleActive}
+            noDataLabel={noDataLabel}
           />
         </>
       )}
