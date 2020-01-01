@@ -7,6 +7,7 @@ import { Text, ITextStyles } from 'office-ui-fabric-react/lib/Text'
 import { BrowserRouter as Router, Switch, Route, Link, useHistory } from 'react-router-dom'
 import { SearchPage } from './pages/Search'
 import { WatchesPage } from './pages/Watches'
+import { Icon } from 'office-ui-fabric-react'
 
 const logoTextStyles: ITextStyles = {
   root: {
@@ -36,7 +37,9 @@ const Nav: React.FC = () => {
       <Link to="/" style={logoLinkStyle}>
         <Text styles={logoTextStyles}>Gear Valley.</Text>
       </Link>
-      <FabricLink onClick={handleNavigation('/watches')}>Price Watches</FabricLink>
+      <FabricLink onClick={handleNavigation('/watches')} title="Price Watches">
+        <Icon iconName="DoubleBookmark" />
+      </FabricLink>
     </Stack>
   )
 }
