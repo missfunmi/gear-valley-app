@@ -4,7 +4,7 @@ import formatDistance from 'date-fns/formatDistance'
 import { Text, ITextStyles } from 'office-ui-fabric-react/lib/Text'
 import { Card, ICardTokens, ICardSectionStyles, ICardSectionTokens } from '@uifabric/react-cards'
 import { FontWeights } from '@uifabric/styling'
-import { IPriceWatch } from 'types'
+import { IPriceWatch, ITogglePriceWatchActiveRequest } from 'types'
 import { GearCardImage } from 'components/GearCard/GearCardImage'
 import {
   Stack,
@@ -13,10 +13,11 @@ import {
   IButtonStyles,
   ActionButton,
 } from 'office-ui-fabric-react'
-import { useDeletePriceWatchService, useTogglePriceWatchService } from 'services'
 
 interface IWatchCardProps {
   priceWatch: IPriceWatch
+  onToggleActive: (request: ITogglePriceWatchActiveRequest) => Promise<void>
+  onDeleteWatch: (watchId: string) => Promise<void>
 }
 
 const siteTextStyles: ITextStyles = {
@@ -72,34 +73,22 @@ const cardTokens: ICardTokens = { childrenMargin: 12 }
 
 const priceHistoryStackTokens: IStackTokens = { padding: 9 }
 
-interface ITogglePriceWatchActive {
-  watchId?: string
-  active?: boolean
-}
-
 // tslint:disable:jsx-no-lambda
-export const WatchCard: React.FC<IWatchCardProps> = ({ priceWatch }) => {
-  const [isActive, setIsActive] = React.useState(priceWatch.active)
-  const [toggleRequest, setToggleRequest] = React.useState<ITogglePriceWatchActive | undefined>()
+export const WatchCard: React.FC<IWatchCardProps> = ({
+  priceWatch,
+  onDeleteWatch,
+  onToggleActive,
+}) => {
   const [showPriceHistory, setShowPriceHistory] = React.useState<boolean>(false)
-  const [watchIdToDelete, setWatchIdToDelete] = React.useState<string | undefined>()
-  const useDeletePriceWatchResponse = useDeletePriceWatchService(watchIdToDelete)
-  const useTogglePriceWatchResponse = useTogglePriceWatchService(
-    toggleRequest?.watchId,
-    toggleRequest?.active
-  )
-  const [watch, setWatch] = React.useState(useTogglePriceWatchResponse.data || priceWatch)
 
-  const handleIsActiveToggle = () => {
-    console.log('Toggling')
-    const newState = !watch.active
-    const request: ITogglePriceWatchActive = {
-      watchId: priceWatch.watchId,
-      active: newState,
-    }
-    setIsActive(newState)
-    setToggleRequest(request)
+  const handleToggleActive = () => {
+    onToggleActive({ watchId: priceWatch.watchId, active: !priceWatch.active })
   }
+
+  const handleDeleteWatch = () => {
+    onDeleteWatch(priceWatch.watchId!)
+  }
+
   return (
     <Card aria-label="Clickable horizontal card " horizontal tokens={cardTokens}>
       <Card.Item>
@@ -131,9 +120,9 @@ export const WatchCard: React.FC<IWatchCardProps> = ({ priceWatch }) => {
       </Card.Section>
       <Card.Section styles={footerCardSectionStyles} tokens={footerCardSectionTokens}>
         <ActionButton
-          iconProps={{ iconName: isActive ? 'Hide' : 'RedEye', styles: iconStyles }}
-          title={isActive ? 'Pause Watch' : 'Activate Watch'}
-          onClick={handleIsActiveToggle}
+          iconProps={{ iconName: priceWatch.active ? 'Hide' : 'RedEye', styles: iconStyles }}
+          title={priceWatch.active ? 'Pause Watch' : 'Activate Watch'}
+          onClick={handleToggleActive}
           styles={actionButtonStyles}
         />
         <ActionButton
@@ -148,7 +137,7 @@ export const WatchCard: React.FC<IWatchCardProps> = ({ priceWatch }) => {
         <ActionButton
           iconProps={{ iconName: 'Delete', styles: iconStyles }}
           title="Remove Watch"
-          onClick={() => setWatchIdToDelete(priceWatch.watchId)}
+          onClick={handleDeleteWatch}
           styles={actionButtonStyles}
         />
       </Card.Section>

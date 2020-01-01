@@ -32,7 +32,7 @@ export interface IPriceWatch {
   id: string
   created: Date
   lastModified: Date
-  watchId: string
+  watchId?: string
   keyword: string
   title: string
   description: string
@@ -42,7 +42,7 @@ export interface IPriceWatch {
   currentPrice: ISpotPrice
   priceHistory: Array<ISpotPrice>
   image: IImage
-  active: boolean
+  active?: boolean
 }
 export interface IPriceWatchResult {
   data: Array<IPriceWatch>
@@ -50,4 +50,8 @@ export interface IPriceWatchResult {
 export interface ISpotPrice {
   price: number
   dateOfCheck: Date
+}
+interface ITogglePriceWatchActiveRequest {
+  watchId?: string
+  active?: boolean
 }
