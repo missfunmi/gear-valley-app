@@ -47,16 +47,16 @@ public class PriceChecker {
             log.info("Checking latest price at url={} for watch={}", url, watch);
 
             // Find latest price
+            BigDecimal currentPrice = watch.getCurrentPrice().getPrice();
             BigDecimal newPrice = priceCheckClient.searchForPriceAtUrl(url).getPrice();
-            log.info(
-                "Found newPrice={} for watchId={}, whose oldPrice={}",
-                newPrice,
-                watchId,
-                watch.getCurrentPrice().getPrice());
 
             // Update price history if price is different
-            BigDecimal currentPrice = watch.getCurrentPrice().getPrice();
             if (currentPrice.compareTo(newPrice) != 0) {
+              log.info(
+                  "watchId={} has newPrice={} which is different from currentPrice={}, will update price history",
+                  watchId,
+                  newPrice,
+                  currentPrice);
               PriceWatchUpdateRequest updateRequest =
                   PriceWatchUpdateRequest.builder()
                       .watchId(watchId)
@@ -66,7 +66,7 @@ public class PriceChecker {
               var updated = priceWatchService.updatePriceWatch(updateRequest);
               String logger =
                   updated.isPresent()
-                      ? "Successfully updated price check for watchId=%s"
+                      ? "Successfully updated price watch for watchId=%s"
                       : "No watch found for watchId=%s, has it been deleted meanwhile?";
               log.info(String.format(logger, watchId));
             }
