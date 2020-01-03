@@ -14,7 +14,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class REIGearPriceCheckClient extends ParserBasedGearPriceCheckClient {
 
-  private static final String GEAR_DETAIL_ID = "page-data";
+  private static final String REI_OUTLET_PREFIX = "/rei-garage";
+  private static final String OUTLET_GEAR_DETAIL_ID = "page-data";
+  private static final String MAIN_GEAR_DETAIL_ID = "page-content";
+  private static final String MAIN_GEAR_DETAIL_SUBSELECTOR =
+      "script[data-client-store=product-price-data]";
   private final ObjectMapper objectMapper;
 
   @Autowired
@@ -32,7 +36,14 @@ public class REIGearPriceCheckClient extends ParserBasedGearPriceCheckClient {
 
   @Override
   Element filterToGearDetail(Document document) {
-    return document.getElementById(GEAR_DETAIL_ID);
+    if (document.location().contains(REI_OUTLET_PREFIX)) {
+      return document.getElementById(OUTLET_GEAR_DETAIL_ID);
+    } else {
+      return document
+          .getElementById(MAIN_GEAR_DETAIL_ID)
+          .select(MAIN_GEAR_DETAIL_SUBSELECTOR)
+          .get(0);
+    }
   }
 
   @Override
@@ -40,11 +51,18 @@ public class REIGearPriceCheckClient extends ParserBasedGearPriceCheckClient {
     String html = element.html();
     try {
       HashMap possibleJson = objectMapper.readValue(html, HashMap.class);
-      Double extractedPrice =
-          (Double)
-              ((HashMap) ((HashMap) possibleJson.get("product")).get("displayPrice")).get("min");
+
+      Double extractedPrice;
+      if (element.baseUri().contains(REI_OUTLET_PREFIX)) {
+        extractedPrice =
+            (Double)
+                ((HashMap) ((HashMap) possibleJson.get("product")).get("displayPrice")).get("min");
+      } else {
+        extractedPrice = (Double) possibleJson.get("min");
+      }
+
       String price = String.format("%.2f", extractedPrice);
-      log.info("Extracted latest price={}", price);
+      log.info("Extracted latest price={} for url={}", price, element.baseUri());
       return new BigDecimal(price);
     } catch (Exception e) {
       throw new RuntimeException(
