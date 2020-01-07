@@ -1,7 +1,7 @@
 # Gear Valley
 A price tracking app for gear shoppers.
 
-This apps lets users search for sports gear across a variety of websites, select which ones to track, and optionally be notified if the price of their selected item(s) changes.
+This app lets users search for sports gear across a variety of websites, select which ones to track, and optionally be notified if the price of their selected item(s) changes.
 
 ## Local Development
 
