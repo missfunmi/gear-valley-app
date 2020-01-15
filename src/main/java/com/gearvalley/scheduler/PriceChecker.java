@@ -17,15 +17,18 @@ import org.springframework.stereotype.Service;
 public class PriceChecker {
   private final PriceWatchService priceWatchService;
   private final GearPriceCheckClient priceCheckClient;
+  private final Notifier notifier;
   private final Site rei;
 
   @Autowired
   public PriceChecker(
       PriceWatchService priceWatchService,
       SitesConfig sitesConfig,
-      GearPriceCheckClient priceCheckClient) {
+      GearPriceCheckClient priceCheckClient,
+      Notifier notifier) {
     this.priceWatchService = priceWatchService;
     this.priceCheckClient = priceCheckClient;
+    this.notifier = notifier;
     this.rei = sitesConfig.getRei();
   }
 
@@ -64,11 +67,12 @@ public class PriceChecker {
                       .keepActive(true)
                       .build();
               var updated = priceWatchService.updatePriceWatch(updateRequest);
-              String logger =
-                  updated.isPresent()
-                      ? "Successfully updated price watch for watchId=%s"
-                      : "No watch found for watchId=%s, has it been deleted meanwhile?";
-              log.info(String.format(logger, watchId));
+              if (updated.isPresent()) {
+                log.info("Successfully updated price watch for watchId={}", watchId);
+                notifier.notifyUpdatedPriceWatch(updated.get());
+              } else {
+                log.info("No watch found for watchId={}, has it been deleted meanwhile?", watchId);
+              }
             }
           }
         });
